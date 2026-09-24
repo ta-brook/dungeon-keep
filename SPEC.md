@@ -501,7 +501,24 @@ class Renderer:
 | Scope creep (multi-tile rooms, tech tree) | High | High | PM gate; update SPEC.md via PR only |
 | Frame drops with many entities | Low | Medium | Cap max monsters/heroes; pool entities |
 
-## 12. Changelog
+## 12. Session Continuity & Development Workflow
+
+### 12.1 Ticket-First Development
+- **Before implementing any feature, fix, or refactor:** create a ticket/issue entry in `state.md` describing what will be done.
+- The ticket must include: title, description, affected files, and expected outcome.
+- No code changes should begin until the ticket is recorded in `state.md`.
+
+### 12.2 State Persistence (`state.md`)
+- At the end of every session (or when the user says "save state"), update `state.md` with:
+  - Current milestone progress
+  - Open tickets/issues
+  - Recently completed work
+  - Blockers or decisions pending
+  - Next steps / todo list
+- `state.md` is the handoff document for continuing work in a new session.
+- Keep it concise but complete enough that a fresh session can pick up without context loss.
+
+## 13. Changelog
 
 | Date | Version | Author | Changes |
 |------|---------|--------|---------|
