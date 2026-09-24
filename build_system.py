@@ -1,14 +1,16 @@
 """Room placement validation and economy."""
 
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from constants import (
     HERO_KILL_GOLD,
+    MONSTER_COSTS,
     ROOM_COSTS,
     STARTING_GOLD,
     TREASURY_GOLD_PER_SECOND,
     TileType,
 )
+from entities import Monster
 from grid import Grid
 
 
@@ -53,6 +55,28 @@ class BuildSystem:
         self._grid.set_tile(x, y, room_type)
         return True
 
+    def can_recruit(self, monster_type: str) -> bool:
+        """Check if a monster can be recruited."""
+        cost = MONSTER_COSTS.get(monster_type)
+        if cost is None:
+            return False
+        return self._gold >= cost
+
+    def recruit(self, lair_x: int, lair_y: int, monster_type: str) -> Optional[Monster]:
+        """Recruit a monster at a Lair. Returns the monster or None."""
+        if self._grid.get_tile(lair_x, lair_y) != TileType.LAIR:
+            return None
+
+        cost = MONSTER_COSTS.get(monster_type)
+        if cost is None:
+            return None
+
+        if self._gold < cost:
+            return None
+
+        self._gold -= cost
+        return Monster(lair_x, lair_y, monster_type)
+
     def update(self, dt: float) -> int:
         """Update economy tick. Returns gold earned this frame."""
         earned = 0
@@ -95,3 +119,13 @@ class BuildSystem:
             TileType.TREASURY: "Treasury",
         }
         return names.get(room_type, "Unknown")
+
+    @staticmethod
+    def get_monster_name(monster_type: str) -> str:
+        """Get display name for a monster type."""
+        names = {
+            "goblin": "Goblin",
+            "slime": "Slime",
+            "skeleton": "Skeleton",
+        }
+        return names.get(monster_type, "Unknown")

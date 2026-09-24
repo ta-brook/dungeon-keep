@@ -1,6 +1,6 @@
 """Rendering system: all draw calls, camera, and scaling."""
 
-from typing import Optional
+from typing import List, Optional
 
 import pygame
 
@@ -16,6 +16,7 @@ from constants import (
     TILE_SIZE,
     TileType,
 )
+from entities import Entity, Hero, Monster
 from grid import Grid
 from ui import UI
 
@@ -61,13 +62,22 @@ class Renderer:
         self,
         grid: Grid,
         ui: UI,
+        monsters: List[Monster],
+        heroes: List[Hero],
         hover_tile: Optional[tuple] = None,
         build_valid: Optional[bool] = None,
+        wave_info: str = "",
     ) -> None:
         """Draw the play area and sidebar."""
         self._draw_grid(grid, hover_tile, build_valid)
         self._draw_trap_indicators(grid)
+        self._draw_entities(monsters, heroes)
         ui.draw(self._logical)
+
+        # Wave info
+        if wave_info:
+            wave_text = self._font_small.render(wave_info, True, COLORS["blood_red"])
+            self._logical.blit(wave_text, (10, SCREEN_HEIGHT - 20))
 
     def _draw_grid(
         self,
@@ -103,11 +113,9 @@ class Renderer:
 
     def _draw_trap_indicators(self, grid: Grid) -> None:
         """Draw warning indicators on tiles adjacent to trap rooms."""
-        trap_color = (*COLORS["trap_orange"][:3], 80)  # semi-transparent
         for y in range(grid.height):
             for x in range(grid.width):
                 if grid.get_tile(x, y) == TileType.TRAP_ROOM:
-                    # Draw small indicators on adjacent floor tiles
                     for dy in [-1, 0, 1]:
                         for dx in [-1, 0, 1]:
                             if dx == 0 and dy == 0:
@@ -121,6 +129,54 @@ class Renderer:
                                     16,
                                 )
                                 pygame.draw.rect(self._logical, COLORS["trap_orange"], rect)
+
+    def _draw_entities(self, monsters: List[Monster], heroes: List[Hero]) -> None:
+        """Draw all monsters and heroes with HP bars."""
+        # Draw monsters
+        for monster in monsters:
+            if not monster.alive:
+                continue
+            self._draw_entity(monster, monster.color)
+
+        # Draw heroes
+        for hero in heroes:
+            if not hero.alive:
+                continue
+            self._draw_entity(hero, hero.color)
+
+    def _draw_entity(self, entity: Entity, color: tuple) -> None:
+        """Draw a single entity with HP bar."""
+        # Body
+        rect = pygame.Rect(
+            int(entity.x - 8),
+            int(entity.y - 8),
+            16,
+            16,
+        )
+        pygame.draw.rect(self._logical, color, rect)
+        pygame.draw.rect(self._logical, COLORS["void_black"], rect, 1)
+
+        # HP bar background
+        hp_bg = pygame.Rect(
+            int(entity.x - 10),
+            int(entity.y - 14),
+            20,
+            4,
+        )
+        pygame.draw.rect(self._logical, COLORS["void_black"], hp_bg)
+
+        # HP bar fill
+        if entity.max_hp > 0:
+            hp_ratio = entity.hp / entity.max_hp
+            hp_width = int(18 * hp_ratio)
+            hp_fill = pygame.Rect(
+                int(entity.x - 9),
+                int(entity.y - 13),
+                hp_width,
+                2,
+            )
+            hp_color = COLORS["slime_green"] if hp_ratio > 0.5 else COLORS["trap_orange"] if hp_ratio > 0.25 else COLORS["blood_red"]
+            pygame.draw.rect(self._logical, hp_color, hp_fill)
 
     def _tile_color(self, tile: TileType) -> tuple:
         """Return the render color for a tile type."""
@@ -144,3 +200,33 @@ class Renderer:
         text = self._font_large.render("PAUSED", True, COLORS["gold_yellow"])
         rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         self._logical.blit(text, rect)
+
+    def draw_win_screen(self) -> None:
+        """Draw win screen overlay."""
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        overlay.set_alpha(200)
+        overlay.fill((0, 0, 0))
+        self._logical.blit(overlay, (0, 0))
+
+        text = self._font_large.render("VICTORY!", True, COLORS["gold_yellow"])
+        rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
+        self._logical.blit(text, rect)
+
+        sub = self._font_medium.render("Dungeon secured", True, COLORS["slime_green"])
+        sub_rect = sub.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
+        self._logical.blit(sub, sub_rect)
+
+    def draw_loss_screen(self) -> None:
+        """Draw loss screen overlay."""
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        overlay.set_alpha(200)
+        overlay.fill((0, 0, 0))
+        self._logical.blit(overlay, (0, 0))
+
+        text = self._font_large.render("DEFEAT", True, COLORS["blood_red"])
+        rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
+        self._logical.blit(text, rect)
+
+        sub = self._font_medium.render("Dungeon Heart destroyed", True, COLORS["trap_orange"])
+        sub_rect = sub.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
+        self._logical.blit(sub, sub_rect)

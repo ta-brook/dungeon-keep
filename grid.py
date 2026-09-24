@@ -1,5 +1,6 @@
 """Tile map and pathfinding."""
 
+import heapq
 from typing import List, Optional, Tuple
 
 from constants import GRID_HEIGHT, GRID_WIDTH, TileType
@@ -72,8 +73,58 @@ class Grid:
         self, start: Tuple[int, int], end: Tuple[int, int]
     ) -> List[Tuple[int, int]]:
         """A* pathfinding from start to end. Returns list of grid coordinates."""
-        # Placeholder for M1 — straight line fallback
-        # Full A* will be implemented in M3
         if start == end:
             return [start]
+
+        # A* implementation
+        open_set = [(0, start)]
+        came_from: dict = {}
+        g_score = {start: 0}
+        f_score = {start: self._heuristic(start, end)}
+        open_set_hash = {start}
+
+        while open_set:
+            _, current = heapq.heappop(open_set)
+            open_set_hash.discard(current)
+
+            if current == end:
+                return self._reconstruct_path(came_from, current)
+
+            for neighbor in self._get_neighbors(current):
+                tentative_g = g_score[current] + 1
+
+                if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g
+                    f_score[neighbor] = tentative_g + self._heuristic(neighbor, end)
+                    if neighbor not in open_set_hash:
+                        heapq.heappush(open_set, (f_score[neighbor], neighbor))
+                        open_set_hash.add(neighbor)
+
+        # No path found — return straight line fallback
         return [start, end]
+
+    def _heuristic(self, a: Tuple[int, int], b: Tuple[int, int]) -> int:
+        """Manhattan distance heuristic."""
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    def _get_neighbors(self, pos: Tuple[int, int]) -> List[Tuple[int, int]]:
+        """Get walkable neighboring tiles."""
+        x, y = pos
+        neighbors = []
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nx, ny = x + dx, y + dy
+            if self.is_walkable(nx, ny):
+                neighbors.append((nx, ny))
+        return neighbors
+
+    def _reconstruct_path(
+        self, came_from: dict, current: Tuple[int, int]
+    ) -> List[Tuple[int, int]]:
+        """Reconstruct path from A* search."""
+        path = [current]
+        while current in came_from:
+            current = came_from[current]
+            path.append(current)
+        path.reverse()
+        return path

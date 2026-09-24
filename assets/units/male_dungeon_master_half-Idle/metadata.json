@@ -1,0 +1,36 @@
+{
+  "group_id": "5ea62523-4597-4060-aa9c-306ce9cdf595",
+  "states": [
+    {
+      "character": {
+        "id": "5ebfbd12-574b-488b-94da-e53696b2e81b",
+        "name": "Idle",
+        "prompt": "male dungeon master half demon humanoid that have 2 horn red hair and can cast magic",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-09-24T14:18:29.056964+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-09-24T14:20:00.733977"
+}

@@ -40,6 +40,33 @@ MONSTER_COSTS = {
 TREASURY_GOLD_PER_SECOND = 1
 HERO_KILL_GOLD = 10
 
+# Monster stats (HP, Damage, Attack Speed, Move Speed in tiles/s, Aggro Range in tiles)
+MONSTER_STATS = {
+    "goblin": {"hp": 30, "damage": 5, "attack_speed": 1.0, "move_speed": 2.0, "aggro_range": 3.0},
+    "slime": {"hp": 50, "damage": 3, "attack_speed": 0.8, "move_speed": 1.0, "aggro_range": 3.0},
+    "skeleton": {"hp": 40, "damage": 8, "attack_speed": 0.6, "move_speed": 1.5, "aggro_range": 3.0},
+}
+
+# Hero stats (HP, Damage, Attack Speed, Move Speed in tiles/s)
+HERO_STATS = {
+    "adventurer": {"hp": 40, "damage": 5, "attack_speed": 1.0, "move_speed": 1.5},
+    "knight": {"hp": 80, "damage": 8, "attack_speed": 0.8, "move_speed": 1.2},
+    "paladin": {"hp": 150, "damage": 12, "attack_speed": 0.6, "move_speed": 1.0},
+}
+
+# Wave definitions: list of (hero_type, count)
+WAVES = [
+    [("adventurer", 3)],
+    [("adventurer", 4), ("knight", 2)],
+    [("adventurer", 5), ("knight", 3), ("paladin", 1)],
+]
+
+# Spawn interval between heroes in a wave
+SPAWN_INTERVAL = 2.0
+
+# Time between waves
+WAVE_COOLDOWN = 5.0
+
 # Colors (RGB tuples) from PALETTE.md
 COLORS = {
     "void_black": (13, 13, 13),

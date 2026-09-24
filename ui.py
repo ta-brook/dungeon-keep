@@ -4,7 +4,7 @@ from typing import Callable, List, Optional, Tuple
 
 import pygame
 
-from constants import COLORS, PLAY_AREA_WIDTH, SIDEBAR_WIDTH, SCREEN_HEIGHT, TileType
+from constants import COLORS, MONSTER_COSTS, PLAY_AREA_WIDTH, SIDEBAR_WIDTH, SCREEN_HEIGHT, TileType
 
 
 class Button:
@@ -46,11 +46,18 @@ class UI:
         self.on_build_selected: Optional[Callable[[TileType], None]] = None
         self.on_build_cancelled: Optional[Callable[[], None]] = None
 
+        # Recruitment mode
+        self.recruit_mode = False
+        self.recruit_lair_pos: Optional[Tuple[int, int]] = None
+        self.recruit_buttons: List[Button] = []
+        self.on_recruit: Optional[Callable[[str], None]] = None
+
         self._font_medium = pygame.font.SysFont("monospace", 14)
         self._font_small = pygame.font.SysFont("monospace", 10)
-        self._create_buttons()
+        self._create_build_buttons()
+        self._create_recruit_buttons()
 
-    def _create_buttons(self) -> None:
+    def _create_build_buttons(self) -> None:
         """Create build buttons in the sidebar."""
         panel_x = PLAY_AREA_WIDTH
         start_y = 80
@@ -75,24 +82,84 @@ class UI:
             btn = Button(rect, name, make_callback(), cost=cost)
             self.buttons.append(btn)
 
+    def _create_recruit_buttons(self) -> None:
+        """Create recruit buttons for when a Lair is selected."""
+        panel_x = PLAY_AREA_WIDTH
+        start_y = 200
+        btn_w = 80
+        btn_h = 30
+        gap = 6
+
+        monsters = [
+            ("goblin", "Goblin", MONSTER_COSTS["goblin"]),
+            ("slime", "Slime", MONSTER_COSTS["slime"]),
+            ("skeleton", "Skeleton", MONSTER_COSTS["skeleton"]),
+        ]
+
+        for i, (mtype, name, cost) in enumerate(monsters):
+            x = panel_x + 14 + (i % 2) * (btn_w + gap)
+            y = start_y + (i // 2) * (btn_h + gap)
+            rect = pygame.Rect(x, y, btn_w, btn_h)
+
+            def make_callback(mt: str = mtype) -> Callable[[], None]:
+                return lambda: self._do_recruit(mt)
+
+            btn = Button(rect, name, make_callback(), cost=cost)
+            self.recruit_buttons.append(btn)
+
     def _select_build(self, room_type: TileType) -> None:
         """Select a room type to build."""
         if self.selected_build == room_type:
-            # Deselect if already selected
             self.selected_build = None
             if self.on_build_cancelled:
                 self.on_build_cancelled()
         else:
             self.selected_build = room_type
+            self.recruit_mode = False
             if self.on_build_selected:
                 self.on_build_selected(room_type)
+
+    def start_recruit_mode(self, lair_x: int, lair_y: int) -> None:
+        """Enter recruit mode for a specific Lair."""
+        self.recruit_mode = True
+        self.recruit_lair_pos = (lair_x, lair_y)
+        self.selected_build = None
+
+    def cancel_recruit(self) -> None:
+        """Exit recruit mode."""
+        self.recruit_mode = False
+        self.recruit_lair_pos = None
+
+    def _do_recruit(self, monster_type: str) -> None:
+        """Handle recruit button click."""
+        if self.on_recruit:
+            self.on_recruit(monster_type)
+        self.recruit_mode = False
+        self.recruit_lair_pos = None
 
     def cancel_build(self) -> None:
         """Cancel current build selection."""
         self.selected_build = None
+        self.recruit_mode = False
 
     def handle_event(self, event: pygame.event.Event) -> bool:
         """Process a Pygame event. Returns True if a button was clicked."""
+        # Scale event position to logical coordinates
+        if hasattr(event, 'pos'):
+            event_copy = event
+            # Event pos is in display coordinates, need logical
+            # Buttons use logical coordinates
+            pass
+
+        if self.recruit_mode:
+            for btn in self.recruit_buttons:
+                if btn.handle_event(event):
+                    return True
+            # Clicking outside cancels recruit
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                self.cancel_recruit()
+                return True
+
         for btn in self.buttons:
             if btn.handle_event(event):
                 return True
@@ -101,6 +168,9 @@ class UI:
     def update(self) -> None:
         """Update button states based on gold availability."""
         for btn in self.buttons:
+            btn.disabled = self.build_system.gold < btn.cost
+
+        for btn in self.recruit_buttons:
             btn.disabled = self.build_system.gold < btn.cost
 
     def draw(self, surface: pygame.Surface) -> None:
@@ -132,7 +202,7 @@ class UI:
         build_label = self._font_medium.render("BUILD", True, COLORS["ui_border"])
         surface.blit(build_label, (panel_x + 10, 58))
 
-        # Buttons
+        # Build buttons
         for btn in self.buttons:
             self._draw_button(surface, btn)
 
@@ -144,15 +214,20 @@ class UI:
             )
             surface.blit(sel_text, (panel_x + 10, 180))
 
+        # Recruit mode
+        if self.recruit_mode and self.recruit_lair_pos:
+            rec_label = self._font_medium.render("RECRUIT", True, COLORS["slime_green"])
+            surface.blit(rec_label, (panel_x + 10, 185))
+
+            for btn in self.recruit_buttons:
+                self._draw_button(surface, btn)
+
     def _draw_button(self, surface: pygame.Surface, btn: Button) -> None:
         """Draw a single button."""
         # Background
         if btn.disabled:
             bg_color = COLORS["stone_gray"]
             border_color = COLORS["ui_border"]
-        elif self.selected_build and btn.text == self.build_system.get_room_name(self.selected_build):
-            bg_color = COLORS["heart_purple"]
-            border_color = COLORS["gold_yellow"]
         elif btn.hovered:
             bg_color = COLORS["wall_gray"]
             border_color = COLORS["gold_yellow"]
