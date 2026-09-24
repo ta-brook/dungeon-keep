@@ -1,9 +1,32 @@
 """Game entities: monsters, heroes, and projectiles."""
 
+import math
 from typing import List, Optional, Tuple
 
 from constants import HERO_STATS, MONSTER_STATS, TILE_SIZE
 from grid import Grid
+
+
+def angle_to_direction(angle: float) -> str:
+    """Convert an angle (radians) to one of 8 directions."""
+    # Normalize angle to 0-2PI
+    angle = angle % (2 * math.pi)
+    # 8 directions: divide circle into 8 segments
+    # Each segment is PI/4 (45 degrees)
+    # 0 = east, PI/4 = south-east, PI/2 = south, etc.
+    directions = [
+        "east",         # 0 to PI/8
+        "south-east",   # PI/8 to 3PI/8
+        "south",        # 3PI/8 to 5PI/8
+        "south-west",   # 5PI/8 to 7PI/8
+        "west",         # 7PI/8 to 9PI/8
+        "north-west",   # 9PI/8 to 11PI/8
+        "north",        # 11PI/8 to 13PI/8
+        "north-east",   # 13PI/8 to 15PI/8
+        "east",         # 15PI/8 to 2PI
+    ]
+    segment = int((angle + math.pi / 8) / (math.pi / 4))
+    return directions[min(segment, 8)]
 
 
 class Entity:
@@ -153,6 +176,9 @@ class Hero(Entity):
         self.path: List[Tuple[int, int]] = []
         self.path_timer = 0.0
         self.path_target: Optional[Tuple[int, int]] = None
+        self.animation_timer = 0.0
+        self.facing_direction = "south"
+        self.is_moving = False
 
     def set_path(self, path: List[Tuple[int, int]]) -> None:
         """Set movement path."""
@@ -197,6 +223,20 @@ class Hero(Entity):
 
         speed = self.move_speed * TILE_SIZE * dt
         move_dist = min(speed, dist)
+        
+        # Track movement direction for animation
+        if dist > 0.1:
+            self.is_moving = True
+            self.animation_timer += dt
+            # Determine facing direction based on movement vector
+            angle = math.atan2(dy, dx)  # radians
+            # Convert to 8 directions
+            # 0 = east, PI/2 = south, PI = west, -PI/2 = north
+            # In pygame: y increases downward, so flip y
+            self.facing_direction = angle_to_direction(-angle)
+        else:
+            self.is_moving = False
+        
         self.x += (dx / dist) * move_dist
         self.y += (dy / dist) * move_dist
 

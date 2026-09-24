@@ -41,6 +41,7 @@ class Renderer:
         self._font_small = pygame.font.SysFont("monospace", 12)
         self._time = 0.0
         self.cursor_mode = "select"  # select, build, recruit
+        self._walk_frames: dict = {}  # Cache for walk animation frames
 
     def clear(self) -> None:
         """Clear the logical frame."""
@@ -198,15 +199,30 @@ class Renderer:
             if sprite_id:
                 return self._assets.get(sprite_id)
         elif isinstance(entity, Hero):
-            mapping = {
-                "adventurer": "hero_knight",
-                "knight": "hero_knight",
-                "paladin": "hero_paladin",
-            }
-            sprite_id = mapping.get(entity.hero_type)
-            if sprite_id:
-                return self._assets.get(sprite_id)
+            # Use animated knight sprites for knight/paladin
+            if entity.hero_type in ("knight", "adventurer", "paladin"):
+                return self._get_hero_sprite(entity)
         return None
+
+    def _get_hero_sprite(self, hero: Hero) -> Optional[pygame.Surface]:
+        """Get the appropriate sprite for a hero, with animation."""
+        if hero.is_moving:
+            # Cycle through walk animation frames
+            frame_duration = 0.1  # seconds per frame
+            frame_index = int(hero.animation_timer / frame_duration) % 8
+            frame_path = f"assets/units/knight_anims/walk/frame_{frame_index:02d}.png"
+            if frame_path in self._walk_frames:
+                return self._walk_frames[frame_path]
+            # Load and cache frame
+            try:
+                surf = pygame.image.load(frame_path).convert_alpha()
+                self._walk_frames[frame_path] = surf
+                return surf
+            except Exception:
+                pass
+        
+        # Idle or fallback
+        return self._assets.get("hero_knight")
 
     def _draw_entity(self, entity: Entity) -> None:
         """Draw a single entity with sprite or colored rectangle fallback."""
