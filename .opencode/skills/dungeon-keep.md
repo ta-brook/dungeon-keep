@@ -1,27 +1,30 @@
-# Dungeon Keep Prototype — Project Skill
+# Dungeon Keep — Project Skill
 
 ## Overview
-Dungeon Keep is a **real-time-with-pause** 2D pixel-art dungeon management prototype.
-- **Genre:** Dungeon-building / defense / tycoon hybrid
+Dungeon Keep is a **real-time-with-pause** 2D pixel-art dungeon management and guild simulation game.
+- **Genre:** Dungeon-building / defense / guild management / crafting / raiding hybrid
 - **Tech:** Python + Pygame, compiled to browser via Pygbag
-- **Scope:** Single-screen prototype, 3 waves, win/lose condition
-- **Vibe:** Dark / gritty fantasy
+- **Scope:** 8 milestones — M1–M4 core dungeon defense, M5–M8 guild management expansion
+- **Vibe:** Dark / gritty fantasy dungeon + guild management
+- **Inspiration:** Creator Chronicles (guild management sim) meets Dungeon Keeper (dungeon defense)
 
 ## Team Structure
 
 | Role | Responsibilities |
 |------|------------------|
-| **PM** | Milestone planning, scope gatekeeping, acceptance criteria, prioritization |
+| **PM** | Milestone planning (M1–M8), scope gatekeeping, acceptance criteria, economy balance review |
 | **Senior Developer** | Architecture, core systems, code review, performance, integration |
-| **Designer** | Pixel art sprites, tilesets, UI mockups, color palette, animation specs |
+| **Designer** | Pixel art sprites, tilesets, UI mockups, color palette, animation specs, NPC portraits |
+| **Economy Systems Designer** | Crafting recipes, trade balance, profession rates, raid difficulty, NPC progression |
 
 ## Tech Stack & Environment
 
 - **Engine:** Pygame 2.5+
 - **Browser Build:** Pygbag (`pygbag .` from project root)
 - **Python:** 3.10+
-- **Screen Size:** 512 x 384 logical pixels (16x12 grid of 32px tiles)
-- **Scale:** 2x for browser display (1024 x 768 canvas)
+- **Screen Size (M1–M4):** 512 x 384 logical pixels (16x12 grid of 32px tiles)
+- **Screen Size (M5+):** 768 x 384 logical pixels (24x18 grid, camera scrolling)
+- **Scale:** 2x for browser display (1024 x 768 → 1536 x 768)
 
 ## Coding Conventions
 
@@ -43,6 +46,15 @@ Dungeon Keep is a **real-time-with-pause** 2D pixel-art dungeon management proto
    - `ui.py` — buttons, panels, text (drawn via `renderer.py`)
    - `grid.py` — tile map, pathfinding, collision data
    - `combat.py` — damage formulas, attack cooldowns, death resolution
+   - `npc.py` — NPC data, guild management, morale system
+   - `professions.py` — profession definitions, production ticks, leveling
+   - `crafting.py` — recipes, resource inventory, crafting queue
+   - `raids.py` — raid party formation, auto-battle, loot tables
+   - `trading.py` — auction house, market demand, visitors
+   - `village.py` — multi-tile building placement, grid expansion
+   - `codex.py` — progression tracking, completion %, milestone rewards
+   - `chronicle.py` — event log, timestamps, summary generation
+   - `camera.py` — camera system for scrolling (M5+)
 
 2. **No Circular Imports:** `constants.py` and `assets.py` are leaf modules. `main.py` is the root.
 
@@ -50,17 +62,23 @@ Dungeon Keep is a **real-time-with-pause** 2D pixel-art dungeon management proto
    ```
    Process Input -> Update Logic (if not paused) -> Render Frame
    ```
-   Target: 60 FPS. Use `dt` (delta time in seconds) for all movement and cooldowns.
+   Target: 60 FPS. Use `dt` (delta time in seconds) for all movement, cooldowns, and production ticks.
 
 4. **Entity Component Pattern (lightweight):**
    - Base `Entity` class with `update(dt)`, `draw(surface, camera_offset)`
    - `Monster(Entity)`, `Hero(Entity)`, `Projectile(Entity)`
    - Composition for behaviors: `CombatStats`, `Movement` as mixin/dataclass attributes
+   - `NPC` is a separate dataclass (not an Entity) — managed by `GuildManager`
 
 5. **Pathfinding:**
-   - Prototype uses A* on the 16x12 grid.
-   - Grid nodes are walkable or blocked by rooms/monsters.
-   - Heroes recalculate path every 0.5 seconds or on obstacle change.
+   - M1–M4: A* on the 16x12 grid. Grid nodes are walkable or blocked by rooms/monsters. Heroes recalculate path every 0.5 seconds.
+   - M5+: A* on the 24x18 grid with camera scrolling. Buildings block tiles.
+
+6. **Economy Systems (M5+):**
+   - All production/crafting/raid systems use `dt` for frame-rate independence
+   - Economy balance is tuned by `dungeon-economy` agent, reviewed by PM at milestone gates
+   - No infinite gold exploits — all income sources are bounded
+   - Raid auto-battle is deterministic (same inputs = same outputs)
 
 ## Asset Pipeline
 
@@ -125,12 +143,17 @@ class Button:
 | M2: Build & Economy | Place rooms, spend gold, UI panel, Treasury income | Senior Dev |
 | M3: Units & Combat | Recruit monsters, hero spawning, basic combat, death | Senior Dev + Designer |
 | M4: Waves & Polish | 3 waves, pause/resume, win/lose screens, all art in | Designer + Senior Dev |
+| M5: NPC & Guild | NPC recruitment, guild panel, personalities, morale | Senior Dev + Designer |
+| M6: Crafting & Professions | Multi-tile buildings, profession production, crafting queue, 15+ recipes | Senior Dev + Economy |
+| M7: Dungeon Raids | Raid party formation, auto-battle, loot, soft permadeath | Senior Dev + Economy |
+| M8: Trading, Codex & Chronicle | Auction house, market demand, codex completion, event chronicle | Senior Dev + Economy + Designer |
 
 ## Communication Protocol
 
 - **Designer → Senior Dev:** Deliver sprites as PNGs in `assets/`; provide animation frame counts and pivot points in `assets/manifest.json`
-- **Senior Dev → Designer:** Provide screen dimensions, grid specs, and color constants before M1
-- **PM → All:** Define milestone scope; reject feature creep; approve spec changes via PR to `SPEC.md`
+- **Senior Dev → Designer:** Provide screen dimensions, grid specs, and color constants before M1; provide panel layouts for M5+ UI
+- **Economy → Senior Dev:** Deliver balance tables (recipes, loot, production rates) as data dicts; review at M6, M7, M8 gates
+- **PM → All:** Define milestone scope; reject feature creep; approve spec changes via PR to `SPEC.md`; review economy balance at M6 gate
 
 ## Interaction Rules
 
@@ -140,7 +163,9 @@ class Button:
 ## Constraints & Non-Goals
 
 - **NO** multiplayer or networking
-- **NO** saving/loading (prototype only)
-- **NO** complex AI (heroes use A* toward Dungeon Heart; monsters use simple aggro radius)
+- **NO** saving/loading (prototype only — session state only)
+- **NO** complex AI (heroes use A* toward Dungeon Heart; monsters use simple aggro radius; raids use deterministic auto-battle)
 - **NO** audio for M1–M3; optional SFX in M4 if time permits
-- **NO** scrolling camera (single screen only)
+- **NO** scrolling camera in M1–M4 (single screen only); camera added in M5
+- **NO** more than 3 dungeons, 12 guild members, or 30 NPC portraits in prototype scope
+- **NO** economy balance changes without `dungeon-economy` agent or PM approval

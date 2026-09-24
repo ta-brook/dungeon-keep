@@ -19,6 +19,27 @@ TILE_SIZE = 32
 SCALE_FACTOR = 2
 FPS = 60
 
+# Economy
+STARTING_GOLD = 150
+
+# Room costs
+ROOM_COSTS = {
+    "LAIR": 50,
+    "TRAP_ROOM": 40,
+    "TREASURY": 60,
+}
+
+# Monster costs
+MONSTER_COSTS = {
+    "goblin": 20,
+    "slime": 15,
+    "skeleton": 30,
+}
+
+# Income
+TREASURY_GOLD_PER_SECOND = 1
+HERO_KILL_GOLD = 10
+
 # Colors (RGB tuples) from PALETTE.md
 COLORS = {
     "void_black": (13, 13, 13),

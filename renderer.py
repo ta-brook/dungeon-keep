@@ -14,10 +14,10 @@ from constants import (
     SCREEN_WIDTH,
     SIDEBAR_WIDTH,
     TILE_SIZE,
-    GameState,
     TileType,
 )
 from grid import Grid
+from ui import UI
 
 
 class Renderer:
@@ -57,12 +57,24 @@ class Renderer:
         hint_rect = hint.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
         self._logical.blit(hint, hint_rect)
 
-    def draw_game(self, grid: Grid, hover_tile: Optional[tuple] = None) -> None:
+    def draw_game(
+        self,
+        grid: Grid,
+        ui: UI,
+        hover_tile: Optional[tuple] = None,
+        build_valid: Optional[bool] = None,
+    ) -> None:
         """Draw the play area and sidebar."""
-        self._draw_grid(grid, hover_tile)
-        self._draw_sidebar()
+        self._draw_grid(grid, hover_tile, build_valid)
+        self._draw_trap_indicators(grid)
+        ui.draw(self._logical)
 
-    def _draw_grid(self, grid: Grid, hover_tile: Optional[tuple] = None) -> None:
+    def _draw_grid(
+        self,
+        grid: Grid,
+        hover_tile: Optional[tuple] = None,
+        build_valid: Optional[bool] = None,
+    ) -> None:
         """Render the tile grid in the play area."""
         for y in range(grid.height):
             for x in range(grid.width):
@@ -82,7 +94,33 @@ class Renderer:
             hx, hy = hover_tile
             if grid.in_bounds(hx, hy):
                 h_rect = pygame.Rect(hx * TILE_SIZE, hy * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                pygame.draw.rect(self._logical, COLORS["gold_yellow"], h_rect, 2)
+                if build_valid is True:
+                    pygame.draw.rect(self._logical, COLORS["slime_green"], h_rect, 2)
+                elif build_valid is False:
+                    pygame.draw.rect(self._logical, COLORS["blood_red"], h_rect, 2)
+                else:
+                    pygame.draw.rect(self._logical, COLORS["gold_yellow"], h_rect, 2)
+
+    def _draw_trap_indicators(self, grid: Grid) -> None:
+        """Draw warning indicators on tiles adjacent to trap rooms."""
+        trap_color = (*COLORS["trap_orange"][:3], 80)  # semi-transparent
+        for y in range(grid.height):
+            for x in range(grid.width):
+                if grid.get_tile(x, y) == TileType.TRAP_ROOM:
+                    # Draw small indicators on adjacent floor tiles
+                    for dy in [-1, 0, 1]:
+                        for dx in [-1, 0, 1]:
+                            if dx == 0 and dy == 0:
+                                continue
+                            ax, ay = x + dx, y + dy
+                            if grid.in_bounds(ax, ay) and grid.get_tile(ax, ay) == TileType.STONE_FLOOR:
+                                rect = pygame.Rect(
+                                    ax * TILE_SIZE + 8,
+                                    ay * TILE_SIZE + 8,
+                                    16,
+                                    16,
+                                )
+                                pygame.draw.rect(self._logical, COLORS["trap_orange"], rect)
 
     def _tile_color(self, tile: TileType) -> tuple:
         """Return the render color for a tile type."""
@@ -95,42 +133,6 @@ class Renderer:
             TileType.TREASURY: COLORS["gold_yellow"],
         }
         return mapping.get(tile, COLORS["stone_gray"])
-
-    def _draw_sidebar(self) -> None:
-        """Render the UI sidebar."""
-        panel_x = PLAY_AREA_WIDTH
-        panel_rect = pygame.Rect(panel_x, 0, SIDEBAR_WIDTH, SCREEN_HEIGHT)
-        pygame.draw.rect(self._logical, COLORS["wall_gray"], panel_rect)
-        pygame.draw.rect(self._logical, COLORS["ui_border"], panel_rect, 2)
-
-        # Header
-        header = self._font_medium.render("DUNGEON KEEP", True, COLORS["gold_yellow"])
-        self._logical.blit(header, (panel_x + 10, 10))
-
-        # Divider
-        pygame.draw.line(
-            self._logical,
-            COLORS["ui_border"],
-            (panel_x + 10, 40),
-            (panel_x + SIDEBAR_WIDTH - 10, 40),
-            1,
-        )
-
-        # Instructions
-        lines = [
-            "Controls:",
-            "Click grid: select",
-            "Space: pause",
-            "ESC: cancel",
-            "",
-            "M1 Skeleton",
-            "Grid: 16x12",
-        ]
-        y_offset = 55
-        for line in lines:
-            text = self._font_small.render(line, True, COLORS["ui_border"])
-            self._logical.blit(text, (panel_x + 10, y_offset))
-            y_offset += 16
 
     def draw_pause_overlay(self) -> None:
         """Draw a semi-transparent overlay with PAUSED text."""

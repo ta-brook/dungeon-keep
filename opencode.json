@@ -15,6 +15,10 @@
     "dungeon-pm": {
       "description": "Project Manager for Dungeon Keep. Guards scope and tracks milestones.",
       "mode": "subagent"
+    },
+    "dungeon-economy": {
+      "description": "Economy Systems Designer for Dungeon Keep. Balances crafting, trading, professions, raids, and NPC progression.",
+      "mode": "subagent"
     }
   }
 }

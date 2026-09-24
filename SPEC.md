@@ -2,38 +2,60 @@
 
 ## 1. Game Concept
 
-**Dungeon Keep** is a real-time-with-pause dungeon management defense prototype. The player builds rooms, recruits monsters, and defends their Dungeon Heart against waves of invading heroes.
+**Dungeon Keep** is a real-time-with-pause dungeon management and guild simulation game. The player builds rooms, recruits monsters, defends their Dungeon Heart against waves of invading heroes, and — inspired by the guild management genre — recruits guild members, assigns professions, crafts items, raids dungeons, and trades at an auction house.
 
-- **Perspective:** Top-down 2D grid
-- **Theme:** Dark fantasy dungeon
-- **Core Loop:** Build → Recruit → Defend → Earn Gold → Expand
+- **Perspective:** Top-down 2D grid (expandable with camera scrolling from M5)
+- **Theme:** Dark fantasy dungeon / guild management
+- **Core Loop (M1–M4):** Build → Recruit → Defend → Earn Gold → Expand
+- **Core Loop (M5–M8):** Build → Recruit NPCs → Craft → Raid → Trade → Expand → Defend → Chronicle
 
 ## 2. Screen Flow
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │ Title Screen│────▶│ Game Screen │────▶│ Win / Loss  │
-└─────────────┘     └─────────────┘     └─────────────┘
-                          ▲                   │
-                          └───────────────────┘
+└─────────────┘     └──────┬──────┘     └──────┬──────┘
+                           │                    │
+              ┌────────────┼────────────┐       │
+              ▼            ▼            ▼       │
+        ┌──────────┐ ┌──────────┐ ┌────────┐   │
+        │  Guild   │ │ Crafting │ │  Raid  │   │
+        │  Panel   │ │  Panel   │ │  Panel │   │
+        └──────────┘ └──────────┘ └────────┘   │
+              │            │            │       │
+              └────────────┼────────────┘       │
+                           ▼                    │
+                    ┌─────────────┐             │
+                    │  Chronicle  │◀────────────┘
+                    │  Summary    │
+                    └─────────────┘
 ```
 
 ### 2.1 Title Screen
 - Dark stone background
 - Game title centered
-- "Start Prototype" button
+- "Start Game" button
 - Brief instruction text
 
 ### 2.2 Game Screen
-- Main play area: 512x384 (left/top)
-- UI sidebar: 256x384 (right) — build buttons, gold, wave info, pause button
-- Total logical resolution: **768x384** (scaled 2x to 1536x768 in browser)
+- **M1–M4:** Main play area: 512x384 (left/top), UI sidebar: 256x384 (right)
+- **M5+:** Main play area: 768x384 (expandable with camera), UI sidebar: 256x384 (right)
+- Total logical resolution: **768x384** (M1–M4) → **1024x384** (M5+, scaled 2x to 2048x768)
+- Sidebar contains tabbed panels: Build, Guild, Crafting, Raid, Auction, Codex, Chronicle
 
 ### 2.3 Win / Loss Screen
 - Overlay on game screen
-- Win: "Dungeon Secured!" + stats (waves survived, gold earned)
-- Loss: "Dungeon Heart Destroyed!" + stats
+- Win: "Dungeon Secured!" + chronicle summary (NPCs recruited, items crafted, gold earned, raids completed)
+- Loss: "Dungeon Heart Destroyed!" + chronicle summary
 - "Restart" button
+
+### 2.4 Sub-Panels (M5+)
+- **Guild Panel:** List of guild members, portraits, traits, morale, profession assignment
+- **Crafting Panel:** Recipe list, resource inventory, crafting queue
+- **Raid Panel:** Dungeon selection, party formation, raid progress, battle log
+- **Auction Panel:** Item listing, market demand, visitor log, bargain alerts
+- **Codex Panel:** Category tabs, completion bars, milestone rewards
+- **Chronicle Panel:** Scrollable event log with timestamps
 
 ## 3. Core Mechanics
 
@@ -119,6 +141,148 @@
   - Player CANNOT place traps during pause (optional balance rule)
 - **Visual:** Slight dark overlay + "PAUSED" text
 
+### 3.9 NPC / Guild Member System
+
+- **Guild Members** are unique NPCs with personalities, professions, and stats.
+- **Recruitment:** Heroes defeated in combat have a chance to join the guild instead of dying. Special "wandering" NPCs also appear between waves.
+- **Capacity:** Max 12 guild members at once (expandable via guild hall upgrades).
+- **Personality Traits:** Each NPC has 2 traits from a pool of 20 (e.g., Brave, Lazy, Greedy, Cheerful, Grumpy, Loyal, Reckless, Cautious, Social, Loner).
+- **Morale:** 0–100 scale. Affected by: combat wins (+), defeats (−), gold income (+), overcrowding (−), matching profession to personality (+).
+- **Permadeath (Soft):** NPCs that fail a raid have a chance to "quit the guild" (leave permanently). Higher morale = lower quit chance.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | str | Unique name from a pool of 120 |
+| `portrait_id` | str | Sprite reference for portrait |
+| `traits` | List[str] | 2 personality traits |
+| `profession` | str | Assigned role (see §3.10) |
+| `morale` | int | 0–100 |
+| `level` | int | 1–20 |
+| `stats` | NPCStats | HP, ATK, DEF, SPD, profession bonuses |
+| `state` | str | `idle`, `working`, `raiding`, `resting` |
+
+### 3.10 Profession System
+
+- Each NPC is assigned one profession. They produce goods passively while idle in the village.
+- **Professions:**
+
+| Profession | Building Required | Output | Rate |
+|------------|-------------------|--------|------|
+| Farmer | Farm | Herbs, Wheat | 1 per 30s |
+| Alchemist | Alchemy Lab | Potions (random) | 1 per 60s |
+| Cook | Kitchen | Meals (morale boost) | 1 per 45s |
+| Blacksmith | Forge | Weapons, Armor | 1 per 90s |
+| Enchanter | Enchanting Table | Scroll, Gems | 1 per 120s |
+| Miner | Mine | Ore, Stone | 1 per 30s |
+| Fisher | Dock | Fish, Rare Catches | 1 per 45s |
+
+- **Skill Levels:** Each profession has levels 1–10. Higher level = faster production + better quality items.
+- **XP Gain:** NPCs gain profession XP from working and from raiding. Level up every 100 XP × current level.
+
+### 3.11 Crafting System
+
+- **Resources:** Herbs, Ore, Fish, Wheat, Wood, Stone, Gems (gathered by professions).
+- **Recipes:** Defined in a recipe table. Each recipe requires specific resources + profession level.
+- **Recipe Categories:**
+
+| Category | Examples | Use |
+|----------|----------|-----|
+| Potions | Health Potion, Strength Potion, Speed Potion | Equip on raid party |
+| Meals | Hearty Stew, Battle Feast | Morale boost before raid |
+| Weapons | Iron Sword, Enchanted Staff | Equip on NPCs for raid stats |
+| Armor | Leather Vest, Chain Mail | Equip on NPCs for raid defense |
+| Scrolls | Fire Scroll, Shield Scroll | Consumable raid buffs |
+
+- **Quality Tiers:** Common (white), Uncommon (green), Rare (blue), Epic (purple). Higher profession level = chance for higher quality.
+- **Crafting Queue:** Player assigns NPCs to craft specific items. Items go to inventory.
+
+### 3.12 Dungeon Raids (Offensive)
+
+- **Concept:** Player forms a party of 1–4 guild members and sends them into a dungeon.
+- **Dungeon List:** 3 dungeons available, each with increasing difficulty.
+
+| Dungeon | Floors | Boss | Min Party Level | Rewards |
+|---------|--------|------|-----------------|---------|
+| Goblin Cave | 3 | Goblin King | 1 | Ore, Herbs, Gold |
+| Sunken Temple | 5 | Sea Witch | 5 | Gems, Scrolls, Enchant Mats |
+| Dragon's Lair | 7 | Ancient Dragon | 10 | Epic gear, Rare recipes, Gold |
+
+- **Auto-Battle:** Raids are resolved automatically. The party fights through floors sequentially.
+- **Battle Log:** After each raid, a log shows: damage dealt, items found, XP gained, casualties.
+- **Raid Mechanics:**
+  - Each floor has a monster encounter (auto-resolved using NPC stats + equipment).
+  - Boss floor has a tougher encounter with guaranteed rare+ loot.
+  - If party wipes, surviving NPCs may quit (morale check).
+  - Raid duration: 30–120 seconds real-time (shown as a progress bar).
+- **Cooldown:** NPCs that raid must rest for 60s before working or raiding again.
+
+### 3.13 Trading / Auction House
+
+- **Auction House:** A building where the player sells crafted items and resources for gold.
+- **Mechanics:**
+  - Player lists items with a price (or auto-price at market value).
+  - "Visitors" (NPC buyers) appear periodically and purchase listed items.
+  - **Market Demand:** Each item category has a demand level (Low / Normal / High) that fluctuates every 2 minutes.
+  - High demand = items sell faster and at +20% price. Low demand = −20%.
+  - **Bargain Events:** Occasionally, a visitor lists a rare item at a discount. Player can buy it.
+- **Income:** Auction House is a major gold source alongside Treasury and hero kills.
+- **Visitor Log:** Shows what sold, for how much, and what's in demand.
+
+### 3.14 Village Expansion (Multi-Tile Buildings)
+
+- **Transition from M2:** Rooms are 1-tile in M1–M4. Starting in M5, new buildings can be multi-tile.
+- **Building Sizes:**
+
+| Building | Size | Cost | Unlock |
+|----------|------|------|--------|
+| Farm | 2×2 | 80 gold | M5 |
+| Alchemy Lab | 2×1 | 100 gold | M5 |
+| Kitchen | 2×1 | 90 gold | M5 |
+| Forge | 2×2 | 120 gold | M5 |
+| Enchanting Table | 1×1 | 150 gold | M6 |
+| Mine | 2×2 | 100 gold | M5 |
+| Dock | 3×1 | 130 gold | M6 |
+| Guild Hall | 3×3 | 200 gold | M5 |
+| Auction House | 2×2 | 150 gold | M6 |
+
+- **Grid Expansion:** Village area starts at 16×12. After M5, the grid expands to 24×18 (with camera scrolling) to accommodate buildings.
+- **Placement Rules:** Buildings must be placed on `STONE_FLOOR`, cannot overlap other buildings, must have at least 1 tile of path access.
+- **Decoration:** Optional cosmetic items (torches, banners, rugs) can be placed on floor tiles for morale bonus (+1 per decoration, max 10).
+
+### 3.15 Codex / Progression System
+
+- **Codex Categories:**
+
+| Category | Tracks | Reward |
+|----------|--------|--------|
+| Alchemy | Potions crafted (unique) | Unlock higher-tier recipes |
+| Cooking | Meals crafted (unique) | Morale bonus increase |
+| Blacksmithing | Weapons/armor crafted | Unlock rare materials |
+| Enchanting | Scrolls/gems crafted | Unlock epic tier |
+| Farming | Crops harvested | Faster growth rate |
+| Mining | Ore mined | Chance for rare ore |
+| Fishing | Fish caught | Rare catch chance up |
+| Raids | Dungeons cleared | Unlock harder dungeons |
+| Collection | NPCs recruited | Unlock new NPC pool |
+
+- **Completion %:** Each category shows X / Y discovered. Total completion shown on codex screen.
+- **Milestones:** Hitting 25%, 50%, 75%, 100% in any category grants a permanent bonus (gold +5%, craft speed +10%, etc.).
+
+### 3.16 Chronicle System
+
+- **Event Log:** All significant events are recorded in a chronological "chronicle."
+- **Events Tracked:**
+  - NPC recruited (name, traits, profession)
+  - NPC quit / died in raid
+  - Building constructed
+  - Rare item crafted
+  - Dungeon boss defeated
+  - Gold milestones (1000g, 5000g, 10000g)
+  - Wave survived
+  - NPC level up / profession level up
+- **Display:** Scrollable text log in a dedicated UI panel. Each entry has a timestamp (wave number or game time).
+- **Summary Screen:** On win/loss, the chronicle summary is shown (total events, NPCs recruited, items crafted, gold earned).
+
 ## 4. Combat System
 
 ### 4.1 Attack Resolution
@@ -143,14 +307,18 @@ if distance(attacker, target) <= attacker.range and attacker.cooldown <= 0:
 | Input | Action |
 |-------|--------|
 | Left Click (grid) | Select tile / build room (if build mode active) |
-| Left Click (UI) | Press buttons, recruit monsters |
+| Left Click (UI) | Press buttons, recruit monsters, interact with panels |
 | Spacebar | Toggle pause |
-| ESC | Deselect current tool / cancel build |
+| ESC | Deselect current tool / cancel build / close panel |
+| Tab (M5+) | Cycle through sidebar panels (Build → Guild → Crafting → Raid → Auction → Codex → Chronicle) |
+| Mouse Wheel (M5+) | Scroll chronicle log / recipe list |
+| Right Click (M5+) | Camera drag (pan viewport) |
 
 ## 6. UI Specification
 
 ### 6.1 Sidebar Layout (256x384, right side)
 
+**M1–M4 Layout:**
 ```
 +------------------+
 |  GOLD: 150       |  <- Top, large text
@@ -170,11 +338,71 @@ if distance(attacker, target) <= attacker.range and attacker.cooldown <= 0:
 +------------------+
 ```
 
+**M5+ Layout (Tabbed Panels):**
+```
++------------------+
+|  GOLD: 150       |  <- Top, large text (always visible)
++------------------+
+| [Build][Guild]   |  <- Tab row (always visible)
+| [Craft][Raid]    |
+| [Auct][Codex]    |
+| [Chron]          |
++------------------+
+|                  |
+|  Active Panel    |  <- Changes based on selected tab
+|  Content         |
+|                  |
++------------------+
+| Wave: 1 / 3      |  <- Wave counter (always visible)
+| Heroes: 3 alive  |  <- Live enemy count (always visible)
++------------------+
+| [PAUSE]          |  <- Pause button (always visible)
++------------------+
+```
+
 ### 6.2 Button States
 - **Default:** Dark stone background, light border
 - **Hover:** Brighter border
 - **Active/Pressed:** Inset shadow, darker background
 - **Disabled:** Grayed out, cannot click (insufficient gold)
+
+### 6.3 Panel Specifications (M5+)
+
+**Guild Panel:**
+- List of guild members (portrait, name, traits, morale bar)
+- Click member → detail view (stats, equipment, profession)
+- "Assign Profession" dropdown (if building exists)
+- Member count: X / 12
+
+**Crafting Panel:**
+- Resource inventory (icons + counts)
+- Recipe list (filterable by category)
+- Crafting queue (assigned NPC, progress bar)
+- "Start Craft" button (disabled if insufficient resources)
+
+**Raid Panel:**
+- Dungeon list (name, floors, difficulty, rewards)
+- Party formation (drag NPCs into 4 slots)
+- "Start Raid" button (shows countdown)
+- Battle log (scrollable, shows after raid)
+
+**Auction Panel:**
+- Item listing (inventory → list for sale)
+- Market demand indicators (per category)
+- Visitor log (who bought what)
+- Bargain alerts (rare items at discount)
+
+**Codex Panel:**
+- Category tabs (Alchemy, Cooking, Blacksmithing, etc.)
+- Completion bar (X / Y discovered)
+- Milestone rewards (25%, 50%, 75%, 100%)
+- Total completion percentage
+
+**Chronicle Panel:**
+- Scrollable event log
+- Each entry: timestamp (wave #), icon, description
+- Filter by event type (optional)
+- "Highlights" toggle (major events only)
 
 ## 7. Art Specification (Designer Deliverables)
 
@@ -197,10 +425,23 @@ if distance(attacker, target) <= attacker.range and attacker.cooldown <= 0:
 | Trap Orange | `#cc5500` | Trap room, fire accents |
 | Blood Red | `#8b0000` | Damage indicators |
 | UI Border | `#7a7a7a` | Panel borders |
+| Farm Green | `#4a7c3a` | Farm tiles, herbs |
+| Alchemy Purple | `#6b3fa0` | Alchemy lab, potions |
+| Forge Orange | `#b8560f` | Forge, weapons |
+| Dock Blue | `#3a6b8a` | Dock, water |
+| Guild Hall Brown | `#6b4a2a` | Guild hall, wood |
+| Auction Teal | `#2a8a7a` | Auction house, market |
+| Quality Common | `#d4d4d4` | Common item border |
+| Quality Uncommon | `#4a7c3a` | Uncommon item border |
+| Quality Rare | `#3a6b8a` | Rare item border |
+| Quality Epic | `#6b3fa0` | Epic item border |
+| Morale High | `#4a7c3a` | Morale bar (70-100) |
+| Morale Mid | `#b8860b` | Morale bar (30-69) |
+| Morale Low | `#8b0000` | Morale bar (0-29) |
 
 ### 7.2 Asset List
 
-#### Tiles (32x32)
+#### Tiles (32x32) — M1–M4
 - `tile_stone_floor.png`
 - `tile_stone_wall.png`
 - `tile_dungeon_heart.png` (animated: pulse glow, 2 frames)
@@ -208,7 +449,18 @@ if distance(attacker, target) <= attacker.range and attacker.cooldown <= 0:
 - `tile_trap_room.png`
 - `tile_treasury.png`
 
-#### Units (32x32)
+#### Tiles (32x32) — M5+ (Village Buildings)
+- `tile_farm.png` (2x2 building)
+- `tile_alchemy_lab.png` (2x1 building)
+- `tile_kitchen.png` (2x1 building)
+- `tile_forge.png` (2x2 building)
+- `tile_enchanting_table.png` (1x1 building)
+- `tile_mine.png` (2x2 building)
+- `tile_dock.png` (3x1 building)
+- `tile_guild_hall.png` (3x3 building)
+- `tile_auction_house.png` (2x2 building)
+
+#### Units (32x32) — M1–M4
 - `unit_goblin_idle.png` (2-frame idle)
 - `unit_slime_idle.png` (2-frame idle, squish)
 - `unit_skeleton_idle.png` (2-frame idle)
@@ -216,7 +468,11 @@ if distance(attacker, target) <= attacker.range and attacker.cooldown <= 0:
 - `unit_hero_knight.png` (2-frame walk)
 - `unit_hero_paladin.png` (2-frame walk)
 
-#### UI
+#### NPC Portraits (32x32) — M5+
+- `npc_portrait_01.png` through `npc_portrait_30.png` (30 unique portraits)
+- `npc_visitor_01.png` through `npc_visitor_10.png` (10 visitor/buyer portraits)
+
+#### UI — M1–M4
 - `ui_panel.png` (256x384 or 9-slice)
 - `ui_button_default.png` (64x32)
 - `ui_button_hover.png` (64x32)
@@ -225,9 +481,41 @@ if distance(attacker, target) <= attacker.range and attacker.cooldown <= 0:
 - `ui_cursor_build.png` (16x16)
 - `ui_cursor_select.png` (16x16)
 
-#### Effects
+#### UI — M5+ (Panels & Icons)
+- `ui_guild_panel.png` (256x384 or 9-slice)
+- `ui_crafting_panel.png` (256x384 or 9-slice)
+- `ui_auction_panel.png` (256x384 or 9-slice)
+- `ui_codex_panel.png` (256x384 or 9-slice)
+- `ui_chronicle_panel.png` (256x384 or 9-slice)
+- `ui_raid_panel.png` (256x384 or 9-slice)
+- `ui_resource_icons/`
+  - `icon_herb.png` (16x16)
+  - `icon_ore.png` (16x16)
+  - `icon_fish.png` (16x16)
+  - `icon_wheat.png` (16x16)
+  - `icon_wood.png` (16x16)
+  - `icon_stone.png` (16x16)
+  - `icon_gem.png` (16x16)
+
+#### Items (16x16) — M6+
+- `item_potion_health.png`
+- `item_potion_strength.png`
+- `item_potion_speed.png`
+- `item_meal_stew.png`
+- `item_meal_feast.png`
+- `item_weapon_sword.png`
+- `item_weapon_staff.png`
+- `item_armor_vest.png`
+- `item_armor_mail.png`
+- `item_scroll_fire.png`
+- `item_scroll_shield.png`
+
+#### Effects — M1–M4
 - `effect_damage.png` (8x8, red flash)
 - `effect_death.png` (16x16, fade particle)
+
+#### Effects — M5+
+- `effect_level_up.png` (16x16, sparkle)
 
 ## 8. File Structure
 
@@ -248,6 +536,15 @@ dungeon-keep/
 ├── input_handler.py         # Mouse/keyboard event translation
 ├── game_state.py            # State machine (MENU, PLAYING, PAUSED, WIN, LOSS)
 ├── build_system.py          # Room placement validation, cost deduction
+├── npc.py                   # NPC data, personalities, guild management
+├── professions.py           # Profession definitions, production ticks, leveling
+├── crafting.py              # Recipes, resource inventory, crafting queue
+├── raids.py                 # Raid party formation, auto-battle, loot tables
+├── trading.py               # Auction house, market demand, visitors
+├── village.py               # Multi-tile building placement, grid expansion, camera
+├── codex.py                 # Progression tracking, completion %, milestone rewards
+├── chronicle.py             # Event log, timestamps, summary generation
+├── camera.py                # Camera system for scrolling (M5+)
 └── assets/
     ├── tiles/
     │   ├── tile_stone_floor.png
@@ -255,14 +552,26 @@ dungeon-keep/
     │   ├── tile_dungeon_heart.png
     │   ├── tile_lair.png
     │   ├── tile_trap_room.png
-    │   └── tile_treasury.png
+    │   ├── tile_treasury.png
+    │   ├── tile_farm.png
+    │   ├── tile_alchemy_lab.png
+    │   ├── tile_kitchen.png
+    │   ├── tile_forge.png
+    │   ├── tile_enchanting_table.png
+    │   ├── tile_mine.png
+    │   ├── tile_dock.png
+    │   ├── tile_guild_hall.png
+    │   └── tile_auction_house.png
     ├── units/
     │   ├── unit_goblin_idle.png
     │   ├── unit_slime_idle.png
     │   ├── unit_skeleton_idle.png
     │   ├── unit_hero_adventurer.png
     │   ├── unit_hero_knight.png
-    │   └── unit_hero_paladin.png
+    │   ├── unit_hero_paladin.png
+    │   └── npc_portraits/
+    │       ├── npc_portrait_01.png through npc_portrait_30.png
+    │       └── npc_visitor_01.png through npc_visitor_10.png
     ├── ui/
     │   ├── ui_panel.png
     │   ├── ui_button_default.png
@@ -270,10 +579,32 @@ dungeon-keep/
     │   ├── ui_button_disabled.png
     │   ├── ui_gold_icon.png
     │   ├── ui_cursor_build.png
-    │   └── ui_cursor_select.png
+    │   ├── ui_cursor_select.png
+    │   ├── ui_guild_panel.png
+    │   ├── ui_crafting_panel.png
+    │   ├── ui_auction_panel.png
+    │   ├── ui_codex_panel.png
+    │   ├── ui_chronicle_panel.png
+    │   ├── ui_raid_panel.png
+    │   └── ui_resource_icons/
+    │       ├── icon_herb.png
+    │       ├── icon_ore.png
+    │       ├── icon_fish.png
+    │       ├── icon_wheat.png
+    │       ├── icon_wood.png
+    │       ├── icon_stone.png
+    │       └── icon_gem.png
+    ├── items/
+    │   ├── item_potion_health.png
+    │   ├── item_potion_strength.png
+    │   ├── item_meal_stew.png
+    │   ├── item_weapon_sword.png
+    │   ├── item_armor_vest.png
+    │   └── item_scroll_fire.png
     └── effects/
         ├── effect_damage.png
-        └── effect_death.png
+        ├── effect_death.png
+        └── effect_level_up.png
 ```
 
 ## 9. Module API Contracts
@@ -425,6 +756,302 @@ class Renderer:
     def present(self) -> None: ...  # blit to screen
 ```
 
+### 9.9 `npc.py`
+```python
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+@dataclass
+class NPCStats:
+    hp: int
+    max_hp: int
+    attack: int
+    defense: int
+    speed: float
+    profession_bonus: float = 1.0
+
+@dataclass
+class NPC:
+    id: int
+    name: str
+    portrait_id: str
+    traits: List[str]
+    profession: str
+    morale: int
+    level: int
+    stats: NPCStats
+    state: str  # 'idle', 'working', 'raiding', 'resting'
+    profession_xp: int = 0
+    rest_cooldown: float = 0.0
+
+NPC_NAMES: List[str] = [...]  # Pool of 120 unique names
+PERSONALITY_TRAITS: List[str] = [...]  # Pool of 20 traits
+
+class GuildManager:
+    def __init__(self, max_members: int = 12) -> None: ...
+    def add_member(self, npc: NPC) -> bool: ...
+    def remove_member(self, npc_id: int) -> None: ...
+    def get_member(self, npc_id: int) -> Optional[NPC]: ...
+    def get_all_members(self) -> List[NPC]: ...
+    def assign_profession(self, npc_id: int, profession: str) -> bool: ...
+    def update_morale(self, npc_id: int, delta: int) -> None: ...
+    def update_all(self, dt: float) -> None: ...
+    def roll_recruitment(self, hero_type: str) -> Optional[NPC]: ...
+    @property
+    def member_count(self) -> int: ...
+```
+
+### 9.10 `professions.py`
+```python
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+
+@dataclass
+class ProfessionDef:
+    name: str
+    building_required: str
+    output_resources: List[Tuple[str, int]]  # (resource_name, amount)
+    base_rate: float  # seconds per production tick
+    xp_per_tick: int
+
+PROFESSIONS: Dict[str, ProfessionDef] = {...}
+
+class ProfessionSystem:
+    def __init__(self) -> None: ...
+    def tick_production(self, npc: NPC, dt: float, buildings: dict) -> List[Tuple[str, int]]: ...
+    def gain_xp(self, npc: NPC, amount: int) -> bool: ...  # returns True if leveled up
+    def get_profession_level(self, npc: NPC) -> int: ...
+    def can_assign(self, npc: NPC, profession: str, buildings: dict) -> bool: ...
+```
+
+### 9.11 `crafting.py`
+```python
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+from enum import Enum, auto
+
+class Quality(Enum):
+    COMMON = auto()
+    UNCOMMON = auto()
+    RARE = auto()
+    EPIC = auto()
+
+@dataclass
+class Recipe:
+    id: str
+    name: str
+    category: str
+    resources: Dict[str, int]  # resource_name -> amount needed
+    profession: str
+    min_profession_level: int
+    craft_time: float  # seconds
+    quality_weights: Dict[Quality, float]
+
+@dataclass
+class CraftItem:
+    recipe_id: str
+    name: str
+    quality: Quality
+    stats: Dict[str, int]  # e.g., {'heal': 20} or {'attack': 5}
+
+@dataclass
+class CraftJob:
+    recipe: Recipe
+    assigned_npc_id: int
+    time_remaining: float
+
+RECIPES: Dict[str, Recipe] = {...}
+
+class CraftingSystem:
+    def __init__(self) -> None: ...
+    def get_resources(self) -> Dict[str, int]: ...
+    def add_resource(self, name: str, amount: int) -> None: ...
+    def remove_resources(self, costs: Dict[str, int]) -> bool: ...
+    def can_craft(self, recipe_id: str, npc: NPC) -> bool: ...
+    def start_craft(self, recipe_id: str, npc_id: int) -> bool: ...
+    def update(self, dt: float) -> List[CraftItem]: ...  # returns newly completed items
+    def get_inventory(self) -> List[CraftItem]: ...
+    def equip_item(self, npc_id: int, item: CraftItem) -> bool: ...
+```
+
+### 9.12 `raids.py`
+```python
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
+@dataclass
+class DungeonFloor:
+    floor_number: int
+    monster_type: str
+    monster_count: int
+    monster_stats: Dict[str, int]
+
+@dataclass
+class Dungeon:
+    id: str
+    name: str
+    floors: List[DungeonFloor]
+    min_party_level: int
+    reward_table: List[Tuple[str, int, float]]  # (item_id, amount, drop_chance)
+
+@dataclass
+class RaidResult:
+    dungeon_id: str
+    floors_cleared: int
+    loot: List[CraftItem]
+    xp_gained: Dict[int, int]  # npc_id -> xp
+    casualties: List[int]  # npc_ids that quit
+    duration: float
+
+DUNGEONS: Dict[str, Dungeon] = {...}
+
+class RaidSystem:
+    def __init__(self) -> None: ...
+    def form_party(self, npc_ids: List[int]) -> bool: ...
+    def can_raid(self, dungeon_id: str, party: List[NPC]) -> bool: ...
+    def start_raid(self, dungeon_id: str) -> None: ...
+    def update(self, dt: float) -> Optional[RaidResult]: ...  # returns result when raid completes
+    @property
+    def raid_in_progress(self) -> bool: ...
+    @property
+    def raid_progress(self) -> float: ...  # 0.0 to 1.0
+```
+
+### 9.13 `trading.py`
+```python
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+from enum import Enum, auto
+
+class Demand(Enum):
+    LOW = auto()
+    NORMAL = auto()
+    HIGH = auto()
+
+@dataclass
+class MarketListing:
+    item: CraftItem
+    price: int
+    seller_is_player: bool
+
+@dataclass
+class Visitor:
+    id: int
+    name: str
+    wanted_items: List[str]  # item categories they buy
+    budget: int
+    time_remaining: float
+
+class TradingSystem:
+    def __init__(self) -> None: ...
+    def get_demand(self, category: str) -> Demand: ...
+    def list_item(self, item: CraftItem, price: int) -> bool: ...
+    def unlist_item(self, listing_id: int) -> None: ...
+    def update(self, dt: float) -> List[Tuple[str, int]]: ...  # returns sales (item_name, gold)
+    def spawn_visitor(self) -> Optional[Visitor]: ...
+    def get_bargain_items(self) -> List[MarketListing]: ...
+    def buy_bargain(self, listing_id: int) -> Optional[CraftItem]: ...
+    def get_sales_log(self) -> List[Tuple[str, int, float]]: ...  # (item_name, gold, timestamp)
+```
+
+### 9.14 `village.py`
+```python
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
+@dataclass
+class BuildingDef:
+    name: str
+    width: int
+    height: int
+    cost: int
+    tile_type: str
+    unlock_milestone: int
+
+BUILDINGS: Dict[str, BuildingDef] = {...}
+
+@dataclass
+class PlacedBuilding:
+    id: int
+    name: str
+    grid_x: int
+    grid_y: int
+    width: int
+    height: int
+
+class VillageSystem:
+    def __init__(self, grid: 'Grid') -> None: ...
+    def can_place(self, building_name: str, gx: int, gy: int) -> bool: ...
+    def place_building(self, building_name: str, gx: int, gy: int) -> Optional[PlacedBuilding]: ...
+    def remove_building(self, building_id: int) -> None: ...
+    def get_buildings(self) -> List[PlacedBuilding]: ...
+    def get_building_at(self, gx: int, gy: int) -> Optional[PlacedBuilding]: ...
+    def expand_grid(self, new_width: int, new_height: int) -> None: ...
+    def has_building_type(self, building_name: str) -> bool: ...
+```
+
+### 9.15 `codex.py`
+```python
+from dataclasses import dataclass, field
+from typing import Dict, List, Tuple
+
+@dataclass
+class CodexEntry:
+    category: str
+    item_id: str
+    name: str
+    discovered: bool = False
+
+@dataclass
+class CodexCategory:
+    name: str
+    entries: List[CodexEntry]
+    milestone_rewards: Dict[int, str]  # percent -> reward description
+
+class CodexSystem:
+    def __init__(self) -> None: ...
+    def discover(self, category: str, item_id: str) -> bool: ...  # returns True if new
+    def get_completion(self, category: str) -> Tuple[int, int]: ...  # (discovered, total)
+    def get_total_completion(self) -> float: ...  # 0.0 to 1.0
+    def check_milestones(self, category: str) -> List[str]: ...  # returns newly hit milestones
+    def get_all_categories(self) -> Dict[str, CodexCategory]: ...
+```
+
+### 9.16 `chronicle.py`
+```python
+from dataclasses import dataclass
+from typing import List, Tuple
+
+@dataclass
+class ChronicleEntry:
+    timestamp: float  # game time in seconds
+    wave_number: int
+    event_type: str
+    description: str
+
+class Chronicle:
+    def __init__(self) -> None: ...
+    def log(self, event_type: str, description: str, wave: int, game_time: float) -> None: ...
+    def get_entries(self, limit: int = 50) -> List[ChronicleEntry]: ...
+    def get_summary(self) -> Dict[str, int]: ...  # event_type -> count
+    def get_highlights(self) -> List[ChronicleEntry]: ...  # major events only
+```
+
+### 9.17 `camera.py`
+```python
+class Camera:
+    def __init__(self, viewport_width: int, viewport_height: int) -> None: ...
+    def update(self, target_x: float, target_y: float) -> None: ...
+    def set_position(self, x: float, y: float) -> None: ...
+    @property
+    def offset_x(self) -> int: ...
+    @property
+    def offset_y(self) -> int: ...
+    def screen_to_world(self, sx: int, sy: int) -> Tuple[int, int]: ...
+    def world_to_screen(self, wx: int, wy: int) -> Tuple[int, int]: ...
+    def clamp(self, world_width: int, world_height: int) -> None: ...
+```
+
 ## 10. Milestones & Acceptance Criteria
 
 ### Milestone 1: Skeleton (Architecture & Rendering)
@@ -491,15 +1118,92 @@ class Renderer:
 
 **Est. Effort:** Senior Dev — 1 session | Designer — final asset pass
 
+### Milestone 5: NPC & Guild System
+**Goal:** Guild members exist, can be recruited, and have personalities/professions.
+
+**AC:**
+- [ ] NPC data model with name, traits, profession, morale, stats
+- [ ] Pool of 30+ unique NPC names and 20 personality traits
+- [ ] Defeated heroes have a chance to join the guild (recruitment prompt)
+- [ ] Wandering NPCs appear between waves for recruitment
+- [ ] Guild panel UI: list of members, portraits, traits, morale bars
+- [ ] NPC can be assigned a profession (if matching building exists)
+- [ ] NPC morale updates based on game events
+- [ ] NPC portrait sprites (at least 10 unique portraits)
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — NPC portraits, guild panel UI
+
+---
+
+### Milestone 6: Crafting & Professions
+**Goal:** NPCs produce resources and craft items passively.
+
+**AC:**
+- [ ] Multi-tile building placement system (Farm, Alchemy Lab, Kitchen, Forge)
+- [ ] Grid expanded to 24×18 with camera scrolling
+- [ ] Profession production ticks: NPCs generate resources while working
+- [ ] Resource inventory UI (herbs, ore, fish, wheat, etc.)
+- [ ] Crafting queue: assign NPC to craft a specific recipe
+- [ ] 15+ recipes across 5 categories (potions, meals, weapons, armor, scrolls)
+- [ ] Quality tiers: Common, Uncommon, Rare, Epic
+- [ ] Profession XP and leveling (1–10)
+- [ ] Crafting log shows what was produced
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — building sprites, resource icons, crafting UI
+
+---
+
+### Milestone 7: Dungeon Raids
+**Goal:** Player can send guild members on auto-battle dungeon raids.
+
+**AC:**
+- [ ] Raid party formation UI (select 1–4 NPCs)
+- [ ] 3 dungeons with multiple floors each
+- [ ] Auto-battle resolution with stat comparison
+- [ ] Battle log display after raid (damage dealt, loot, casualties)
+- [ ] Loot drops added to inventory
+- [ ] NPC rest cooldown after raid (60s)
+- [ ] Soft permadeath: failed raid → morale check → NPC may quit
+- [ ] Raid progress bar (real-time countdown)
+- [ ] Equipment system: equip crafted weapons/armor on NPCs
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — dungeon UI, raid sprites, equipment icons
+
+---
+
+### Milestone 8: Trading, Codex & Chronicle
+**Goal:** Full economy loop with auction house, progression tracking, and event chronicle.
+
+**AC:**
+- [ ] Auction House building with listing UI
+- [ ] Visitor NPCs appear periodically to buy items
+- [ ] Market demand fluctuation (Low/Normal/High per category)
+- [ ] Bargain events (rare items at discount)
+- [ ] Codex screen with 9 categories and completion tracking
+- [ ] Milestone rewards at 25/50/75/100% per category
+- [ ] Chronicle event log (scrollable, timestamped)
+- [ ] Win/loss screen shows chronicle summary
+- [ ] All placeholder art replaced with final pixel art
+- [ ] Full game loop: Build → Recruit → Craft → Raid → Trade → Expand → Defend
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — auction UI, codex UI, chronicle UI, final art pass
+
+---
+
 ## 11. Risk Register
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
-| A* pathfinding too slow on grid | Low | Medium | Grid is only 16x12; precalculate if needed |
+| A* pathfinding too slow on grid | Low | Medium | Grid is only 16x12 (24x18 from M5); precalculate if needed |
 | Pygbag WASM build fails | Medium | High | Test build at M1; keep dependencies minimal |
 | Art delivery delayed | Medium | Medium | Use colored rectangles as drop-in replacements |
 | Scope creep (multi-tile rooms, tech tree) | High | High | PM gate; update SPEC.md via PR only |
 | Frame drops with many entities | Low | Medium | Cap max monsters/heroes; pool entities |
+| NPC system too complex for prototype | Medium | High | Start with 30 NPCs max; simplify traits to 2 per NPC |
+| Camera scrolling breaks input mapping | Medium | Medium | Implement camera.py early in M5; test input thoroughly |
+| Crafting balance (economy too fast/slow) | High | Medium | PM reviews production rates at M6 milestone gate |
+| Raid auto-battle feels unsatisfying | Medium | Medium | Add battle log detail; allow manual intervention in future |
+| Save/load needed for full experience | High | High | Defer to post-prototype; use session-only state for M1–M8 |
 
 ## 12. Session Continuity & Development Workflow
 
@@ -528,6 +1232,7 @@ class Renderer:
 | Date | Version | Author | Changes |
 |------|---------|--------|---------|
 | 2026-09-24 | 0.1.0 | PM + Senior Dev | Initial spec |
+| 2026-09-24 | 0.2.0 | PM | Major expansion: Added NPC/Guild system, Professions, Crafting, Dungeon Raids, Trading/Auction House, Village Expansion (multi-tile), Codex, Chronicle. New milestones M5–M8. New modules: npc.py, professions.py, crafting.py, raids.py, trading.py, village.py, codex.py, chronicle.py, camera.py |
 
 ---
 *This SPEC is the source of truth. Any deviation requires a PR with PM approval.*
