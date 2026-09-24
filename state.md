@@ -1,16 +1,14 @@
 # Dungeon Keep — Session State
 
 ## Current Milestone
-**M3: Units & Combat** — COMPLETE ✅  
-**Asset Integration** — COMPLETE ✅  
-**UI Polish** — COMPLETE ✅
+**Prototype Complete** — COMPLETE ✅
 
 ## Progress
 - [x] Project scaffold created
 - [x] SPEC.md written
-- [x] Agents configured
-- [x] Skill configured
-- [x] Git repository initialized, committed, pushed
+- [x] Agents configured (dungeon-dev, dungeon-designer, dungeon-pm)
+- [x] Skill configured (dungeon-keep)
+- [x] Git repository initialized, committed, pushed to GitHub
 - [x] **TICKET-001: Design Deliverables** — COMPLETE
 - [x] **TICKET-002: M1 Skeleton Implementation** — COMPLETE
 - [x] **TICKET-003: M2 Build & Economy** — COMPLETE
@@ -22,24 +20,29 @@
 None.
 
 ## Recently Completed
-- M3: fully playable prototype with combat, waves, recruitment
-- Asset integration: dungeon-v1 floor tiles + dungeon master NPC with bob animation
-- UI Polish: custom button sprites, panel background, gold icon, custom cursors
+- Fully playable dungeon defense prototype
+- 16 custom dungeon floor tile variations integrated
+- Dungeon master NPC with procedural bob animation
+- Custom UI sprites: buttons, panel, icons, cursors
+- Real-time combat, A* pathfinding, 3-wave spawning
+- Build system: Lair, Trap, Treasury with gold economy
+- Recruitment: Goblin, Slime, Skeleton from Lairs
+- Win/Loss conditions
 
 ## Blockers
 None.
 
-## Next Steps
-1. Continue to M4: Waves & Polish (death animations, restart button, sound, pygbag browser build)
-2. Or add more custom art (monsters, heroes, rooms, effects)
-3. Or stop here — game is fully playable with custom art
+## Session Handoff Notes
+- All code committed and pushed to `https://github.com/ta-brook/dungeon-keep`
+- To resume: clone repo, `pip install -r requirements.txt`, `python main.py`
+- `state.md` always contains latest status
+- `SPEC.md` contains full game design document
 
-## What You Can Play Now
-1. Run `python main.py`
-2. Beautiful dungeon floor variations (your art!)
-3. Dungeon master NPC bobbing near the heart
-4. Custom UI buttons with hover/pressed states
-5. Custom cursors: hammer (build), magic (recruit), pointer (select)
-6. Gold icon next to counter
-7. Build Lairs, recruit monsters, defend against 3 waves
-8. Win/Loss conditions active
+## What You Can Play
+1. `python main.py`
+2. Click title screen to start
+3. Build rooms (Lair/Trap/Treasury) via sidebar buttons
+4. Click Lair → recruit monsters (Goblin/Slime/Skeleton)
+5. Defend against 3 waves of heroes
+6. Spacebar to pause, ESC to cancel
+7. Win: survive all waves. Lose: hero reaches Dungeon Heart.
