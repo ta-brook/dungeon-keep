@@ -40,6 +40,7 @@ class Renderer:
         self._font_medium = pygame.font.SysFont("monospace", 16)
         self._font_small = pygame.font.SysFont("monospace", 12)
         self._time = 0.0
+        self.cursor_mode = "select"  # select, build, recruit
 
     def clear(self) -> None:
         """Clear the logical frame."""
@@ -77,6 +78,7 @@ class Renderer:
         build_valid: Optional[bool] = None,
         wave_info: str = "",
         dt: float = 0.0,
+        mouse_pos: tuple = (0, 0),
     ) -> None:
         """Draw the play area and sidebar."""
         self._time += dt
@@ -85,6 +87,7 @@ class Renderer:
         self._draw_entities(monsters, heroes)
         self._draw_dungeon_master(grid)
         ui.draw(self._logical)
+        self._draw_custom_cursor(mouse_pos)
 
         # Wave info
         if wave_info:
@@ -219,6 +222,19 @@ class Renderer:
         bob_offset = int(math.sin(self._time * 3) * 2)
 
         self._logical.blit(dm_surf, (dm_x, dm_y + bob_offset))
+
+    def _draw_custom_cursor(self, mouse_pos: tuple) -> None:
+        """Draw custom cursor sprite at mouse position."""
+        cursor_map = {
+            "build": "cursor_build",
+            "recruit": "cursor_recruit",
+            "select": "cursor_select",
+        }
+        sprite_id = cursor_map.get(self.cursor_mode, "cursor_select")
+        cursor_surf = self._assets.get(sprite_id)
+
+        if cursor_surf:
+            self._logical.blit(cursor_surf, mouse_pos)
 
     def _tile_color(self, tile: TileType) -> tuple:
         """Return the render color for a tile type."""

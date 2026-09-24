@@ -2,7 +2,8 @@
 
 ## Current Milestone
 **M3: Units & Combat** — COMPLETE ✅  
-**Asset Integration** — COMPLETE ✅
+**Asset Integration** — COMPLETE ✅  
+**UI Polish** — In Progress
 
 ## Progress
 - [x] Project scaffold created
@@ -15,26 +16,33 @@
 - [x] **TICKET-003: M2 Build & Economy** — COMPLETE
 - [x] **TICKET-004: M3 Units & Combat** — COMPLETE
 - [x] **TICKET-005: Asset Integration** — COMPLETE
+- [ ] **TICKET-006: UI Polish — Custom sprites for buttons, panel, icons, cursors** — IN PROGRESS
 
 ## Open Tickets
-None.
+
+### TICKET-006: UI Polish
+**Status:** In Progress  
+**Assignee:** Senior Dev  
+**Description:** Replace rectangle-drawn UI elements with actual sprite art. Use loaded button sprites (default/hover/disabled/pressed), panel background, gold/heart/wave icons, and custom cursors for build/recruit modes.  
+**Affected Files:**
+- `ui.py` — render buttons using sprite sheets instead of rectangles
+- `renderer.py` — draw panel background, custom cursor sprites
+- `main.py` — hide default cursor when custom cursor is active
+**Acceptance Criteria:**
+- [ ] Buttons use actual button sprites with proper state switching
+- [ ] Sidebar uses panel background sprite
+- [ ] Gold icon displayed next to gold counter
+- [ ] Custom cursor shows in build/recruit modes
+- [ ] Buttons show pressed state when clicked
 
 ## Recently Completed
-- M3: fully playable prototype with combat, waves, recruitment
-- Asset integration: dungeon-v1 floor tiles (16 variants) + dungeon master NPC
-- Procedural bob animation on dungeon master
-- Floor tiles randomized per cell for organic look
+- M3 gameplay complete
+- Custom floor tiles and dungeon master integrated
 
 ## Blockers
 None.
 
 ## Next Steps
-1. Continue to M4: Waves & Polish (death animations, restart, sound, final art)
-2. Or stop here — core game is fully playable
-
-## What You Can Play Now
-1. Run `python main.py`
-2. Beautiful dungeon floor variations (your art!)
-3. Dungeon master NPC bobbing near the heart
-4. Build Lairs, recruit monsters, defend against 3 waves
-5. Win/Loss conditions active
+1. Implement TICKET-006
+2. Test visual result
+3. Commit and push

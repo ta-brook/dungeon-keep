@@ -4,6 +4,7 @@ from typing import Callable, List, Optional, Tuple
 
 import pygame
 
+from assets import AssetRegistry
 from constants import COLORS, MONSTER_COSTS, PLAY_AREA_WIDTH, SIDEBAR_WIDTH, SCREEN_HEIGHT, TileType
 
 
@@ -23,6 +24,7 @@ class Button:
         self.cost = cost
         self.hovered = False
         self.disabled = False
+        self.pressed = False
 
     def handle_event(self, event: pygame.event.Event) -> bool:
         """Process a Pygame event. Returns True if clicked."""
@@ -31,16 +33,22 @@ class Button:
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.hovered and not self.disabled:
+                self.pressed = True
                 self.callback()
                 return True
+
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            self.pressed = False
+
         return False
 
 
 class UI:
     """Main UI controller for the sidebar."""
 
-    def __init__(self, build_system) -> None:
+    def __init__(self, build_system, assets: AssetRegistry) -> None:
         self.build_system = build_system
+        self._assets = assets
         self.buttons: List[Button] = []
         self.selected_build: Optional[TileType] = None
         self.on_build_selected: Optional[Callable[[TileType], None]] = None
@@ -144,13 +152,6 @@ class UI:
 
     def handle_event(self, event: pygame.event.Event) -> bool:
         """Process a Pygame event. Returns True if a button was clicked."""
-        # Scale event position to logical coordinates
-        if hasattr(event, 'pos'):
-            event_copy = event
-            # Event pos is in display coordinates, need logical
-            # Buttons use logical coordinates
-            pass
-
         if self.recruit_mode:
             for btn in self.recruit_buttons:
                 if btn.handle_event(event):
@@ -177,11 +178,27 @@ class UI:
         """Draw the UI sidebar onto the given surface."""
         panel_x = PLAY_AREA_WIDTH
 
-        # Gold display
+        # Draw panel background
+        panel_surf = self._assets.get("panel")
+        if panel_surf:
+            surface.blit(panel_surf, (panel_x, 0))
+        else:
+            panel_rect = pygame.Rect(panel_x, 0, SIDEBAR_WIDTH, SCREEN_HEIGHT)
+            pygame.draw.rect(surface, COLORS["wall_gray"], panel_rect)
+            pygame.draw.rect(surface, COLORS["ui_border"], panel_rect, 2)
+
+        # Gold icon + display
+        gold_icon = self._assets.get("gold_icon")
+        if gold_icon:
+            surface.blit(gold_icon, (panel_x + 10, 10))
+            gold_x = panel_x + 30
+        else:
+            gold_x = panel_x + 10
+
         gold_text = self._font_medium.render(
-            f"GOLD: {self.build_system.gold}", True, COLORS["gold_yellow"]
+            f"{self.build_system.gold}", True, COLORS["gold_yellow"]
         )
-        surface.blit(gold_text, (panel_x + 10, 10))
+        surface.blit(gold_text, (gold_x, 10))
 
         # Income hint
         income_text = self._font_small.render(
@@ -223,20 +240,28 @@ class UI:
                 self._draw_button(surface, btn)
 
     def _draw_button(self, surface: pygame.Surface, btn: Button) -> None:
-        """Draw a single button."""
-        # Background
+        """Draw a single button using sprite assets."""
+        # Determine sprite state
         if btn.disabled:
-            bg_color = COLORS["stone_gray"]
-            border_color = COLORS["ui_border"]
+            sprite_id = "button_disabled"
+        elif btn.pressed:
+            sprite_id = "button_pressed"
         elif btn.hovered:
-            bg_color = COLORS["wall_gray"]
-            border_color = COLORS["gold_yellow"]
+            sprite_id = "button_hover"
         else:
-            bg_color = COLORS["wall_gray"]
-            border_color = COLORS["ui_border"]
+            sprite_id = "button_default"
 
-        pygame.draw.rect(surface, bg_color, btn.rect)
-        pygame.draw.rect(surface, border_color, btn.rect, 2)
+        btn_surf = self._assets.get(sprite_id)
+        if btn_surf:
+            # Scale button sprite to match button rect
+            scaled = pygame.transform.scale(btn_surf, (btn.rect.width, btn.rect.height))
+            surface.blit(scaled, btn.rect)
+        else:
+            # Fallback to rectangle
+            bg_color = COLORS["stone_gray"] if btn.disabled else COLORS["wall_gray"]
+            border_color = COLORS["ui_border"] if btn.disabled else COLORS["gold_yellow"] if btn.hovered else COLORS["ui_border"]
+            pygame.draw.rect(surface, bg_color, btn.rect)
+            pygame.draw.rect(surface, border_color, btn.rect, 2)
 
         # Text
         text_color = COLORS["ui_border"] if btn.disabled else COLORS["gold_yellow"]

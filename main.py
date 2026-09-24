@@ -37,7 +37,7 @@ def main() -> None:
     state_machine = StateMachine(initial_state=GameState.MENU)
     grid = Grid()
     build_system = BuildSystem(grid)
-    ui = UI(build_system)
+    ui = UI(build_system, assets)
     renderer = Renderer(screen, assets)
     input_handler = InputHandler()
     wave_manager = WaveManager(grid)
@@ -49,6 +49,9 @@ def main() -> None:
     # Track hovered tile for highlighting
     hovered_tile: tuple | None = None
     build_valid: bool | None = None
+
+    # Hide system cursor when using custom cursor
+    pygame.mouse.set_visible(False)
 
     # Wire up input callbacks
     def on_grid_click(x: int, y: int) -> None:
@@ -146,6 +149,14 @@ def main() -> None:
             hovered_tile = None
             build_valid = None
 
+        # Update cursor mode
+        if ui.selected_build:
+            renderer.cursor_mode = "build"
+        elif ui.recruit_mode:
+            renderer.cursor_mode = "recruit"
+        else:
+            renderer.cursor_mode = "select"
+
         # Update logic (if not paused and not ended)
         if state_machine.state == GameState.PLAYING:
             # Economy
@@ -204,6 +215,7 @@ def main() -> None:
                 build_valid=build_valid,
                 wave_info=wave_info,
                 dt=dt,
+                mouse_pos=(mx, my),
             )
 
             if state_machine.state == GameState.PAUSED:
