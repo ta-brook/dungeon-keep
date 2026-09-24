@@ -1,0 +1,36 @@
+{
+  "group_id": "39a5465b-5fab-45b9-8f3d-9be38740cc8e",
+  "states": [
+    {
+      "character": {
+        "id": "3365edcd-73ec-4f9d-b32b-fb239d6cb0e6",
+        "name": "Idle",
+        "prompt": "28\u00d728 pixel-art dungeon-management game character. Small hunched goblin dungeon worker, olive-green skin, oversized pointed ears, crooked nose, messy dark hair, simple brown leather clothing, tiny tool belt. Facing three-quarters toward camera. Chunky readable silhouette, exaggerated hands and head, two-tone shading. Goblin Skin #5c8a45 as primary color, Guild Hall Brown #6b4a2a for clothing, Void Black #0d0d0d for outline. Dark-fantasy but charming. No weapon. Transparent background. Hard pixel edges, no anti-aliasing.",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-09-24T15:13:37.780139+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-09-24T15:20:41.831496"
+}
