@@ -3,7 +3,7 @@
 ## Current Milestone
 **M3: Units & Combat** — COMPLETE ✅  
 **Asset Integration** — COMPLETE ✅  
-**UI Polish** — In Progress
+**UI Polish** — COMPLETE ✅
 
 ## Progress
 - [x] Project scaffold created
@@ -16,33 +16,30 @@
 - [x] **TICKET-003: M2 Build & Economy** — COMPLETE
 - [x] **TICKET-004: M3 Units & Combat** — COMPLETE
 - [x] **TICKET-005: Asset Integration** — COMPLETE
-- [ ] **TICKET-006: UI Polish — Custom sprites for buttons, panel, icons, cursors** — IN PROGRESS
+- [x] **TICKET-006: UI Polish** — COMPLETE
 
 ## Open Tickets
-
-### TICKET-006: UI Polish
-**Status:** In Progress  
-**Assignee:** Senior Dev  
-**Description:** Replace rectangle-drawn UI elements with actual sprite art. Use loaded button sprites (default/hover/disabled/pressed), panel background, gold/heart/wave icons, and custom cursors for build/recruit modes.  
-**Affected Files:**
-- `ui.py` — render buttons using sprite sheets instead of rectangles
-- `renderer.py` — draw panel background, custom cursor sprites
-- `main.py` — hide default cursor when custom cursor is active
-**Acceptance Criteria:**
-- [ ] Buttons use actual button sprites with proper state switching
-- [ ] Sidebar uses panel background sprite
-- [ ] Gold icon displayed next to gold counter
-- [ ] Custom cursor shows in build/recruit modes
-- [ ] Buttons show pressed state when clicked
+None.
 
 ## Recently Completed
-- M3 gameplay complete
-- Custom floor tiles and dungeon master integrated
+- M3: fully playable prototype with combat, waves, recruitment
+- Asset integration: dungeon-v1 floor tiles + dungeon master NPC with bob animation
+- UI Polish: custom button sprites, panel background, gold icon, custom cursors
 
 ## Blockers
 None.
 
 ## Next Steps
-1. Implement TICKET-006
-2. Test visual result
-3. Commit and push
+1. Continue to M4: Waves & Polish (death animations, restart button, sound, pygbag browser build)
+2. Or add more custom art (monsters, heroes, rooms, effects)
+3. Or stop here — game is fully playable with custom art
+
+## What You Can Play Now
+1. Run `python main.py`
+2. Beautiful dungeon floor variations (your art!)
+3. Dungeon master NPC bobbing near the heart
+4. Custom UI buttons with hover/pressed states
+5. Custom cursors: hammer (build), magic (recruit), pointer (select)
+6. Gold icon next to counter
+7. Build Lairs, recruit monsters, defend against 3 waves
+8. Win/Loss conditions active
