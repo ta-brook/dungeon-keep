@@ -5,11 +5,11 @@
 
 ## Progress
 - [x] Project scaffold created
-- [x] SPEC.md written
+- [x] SPEC.md written (includes ticket-first dev, state.md persistence, commit-and-push rules)
 - [x] Agents configured (dungeon-dev, dungeon-designer, dungeon-pm)
 - [x] Skill configured (dungeon-keep)
 - [x] Git repository initialized and committed
-- [ ] GitHub remote configured (pending user providing repo URL)
+- [x] GitHub remote configured and pushed
 
 ## Open Tickets
 None.
@@ -17,12 +17,11 @@ None.
 ## Recently Completed
 - Initial project setup and planning
 - Team roles and conventions defined
+- Session continuity workflow established (ticket-first, state.md, commit-push)
 
 ## Blockers
-- Waiting for GitHub repo URL to set remote origin
+None.
 
 ## Next Steps
-1. User creates GitHub repo and provides URL
-2. Configure git remote and push
-3. Create first ticket for M1: Skeleton implementation
-4. Begin coding M1
+1. Create ticket for M1: Skeleton implementation
+2. Begin coding M1
