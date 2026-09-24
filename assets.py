@@ -3,7 +3,6 @@
 import glob
 import json
 import os
-import random
 from typing import Dict, List, Optional
 
 import pygame
@@ -12,8 +11,7 @@ import pygame
 class AssetRegistry:
     """Central registry for all game assets.
 
-    Loads real PNGs when available; generates placeholder colored squares
-    from manifest.json otherwise.
+    Loads real PNGs when available; skips missing files.
     """
 
     def __init__(self, manifest_path: str = "assets/manifest.json") -> None:
@@ -24,7 +22,7 @@ class AssetRegistry:
         self._dungeon_master: Optional[pygame.Surface] = None
 
     def load_all(self) -> None:
-        """Load all assets from the manifest; generate placeholders if needed."""
+        """Load all assets from the manifest; skip missing files."""
         with open(self._manifest_path, "r", encoding="utf-8") as f:
             self._manifest = json.load(f)
 
@@ -33,20 +31,14 @@ class AssetRegistry:
             for item in category_data["items"]:
                 asset_id = item["id"]
                 file_path = os.path.join(base_path, item["file"])
-                width, height = item["size"]
-                frames = item.get("frames", 1)
 
                 if os.path.exists(file_path):
-                    surface = pygame.image.load(file_path).convert_alpha()
-                else:
-                    surface = self._generate_placeholder(
-                        width, height, frames, item.get("placeholder_color")
-                    )
-                    # Save placeholder for future reference
-                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-                    pygame.image.save(surface, file_path)
-
-                self._surfaces[asset_id] = surface
+                    try:
+                        surface = pygame.image.load(file_path).convert_alpha()
+                        self._surfaces[asset_id] = surface
+                    except Exception as e:
+                        print(f"Warning: could not load {file_path}: {e}")
+                # If file doesn't exist, skip it (no placeholders)
 
         # Load user's custom assets
         self._load_floor_variants()
@@ -67,7 +59,7 @@ class AssetRegistry:
                 print(f"Warning: could not load floor variant {path}: {e}")
 
         if not self._floor_variants:
-            print("Warning: no floor variants found, using placeholders")
+            print("Warning: no floor variants found")
 
     def _load_dungeon_master(self) -> None:
         """Load dungeon master sprite (south-facing idle)."""
@@ -79,30 +71,6 @@ class AssetRegistry:
                 self._dungeon_master = pygame.transform.scale(surf, (32, 32))
             except Exception as e:
                 print(f"Warning: could not load dungeon master: {e}")
-        else:
-            print("Warning: dungeon master sprite not found")
-
-    def _generate_placeholder(
-        self,
-        width: int,
-        height: int,
-        frames: int,
-        color: Optional[list] = None,
-    ) -> pygame.Surface:
-        """Generate a solid-color placeholder sprite sheet."""
-        if color is None:
-            color = [128, 128, 128]
-
-        sheet_width = width * frames
-        surface = pygame.Surface((sheet_width, height), pygame.SRCALPHA)
-        surface.fill((*color, 255))
-
-        # Draw a dark border so individual frames are visible
-        for i in range(frames):
-            rect = pygame.Rect(i * width, 0, width, height)
-            pygame.draw.rect(surface, (0, 0, 0), rect, 1)
-
-        return surface
 
     def get(self, asset_id: str) -> Optional[pygame.Surface]:
         """Retrieve a loaded asset surface by ID."""
@@ -115,7 +83,7 @@ class AssetRegistry:
     def get_random_floor(self) -> Optional[pygame.Surface]:
         """Get a random floor tile variation."""
         if self._floor_variants:
-            return random.choice(self._floor_variants)
+            return self._floor_variants[0]  # Use first variant consistently
         return None
 
     def has_floor_variants(self) -> bool:

@@ -1,48 +1,49 @@
 # Dungeon Keep — Session State
 
 ## Current Milestone
-**Prototype Complete** — COMPLETE ✅
+**Asset Integration v2** — In Progress
 
 ## Progress
 - [x] Project scaffold created
 - [x] SPEC.md written
-- [x] Agents configured (dungeon-dev, dungeon-designer, dungeon-pm)
-- [x] Skill configured (dungeon-keep)
-- [x] Git repository initialized, committed, pushed to GitHub
-- [x] **TICKET-001: Design Deliverables** — COMPLETE
-- [x] **TICKET-002: M1 Skeleton Implementation** — COMPLETE
-- [x] **TICKET-003: M2 Build & Economy** — COMPLETE
-- [x] **TICKET-004: M3 Units & Combat** — COMPLETE
-- [x] **TICKET-005: Asset Integration** — COMPLETE
-- [x] **TICKET-006: UI Polish** — COMPLETE
+- [x] Agents configured
+- [x] Skill configured
+- [x] Git repository initialized, committed, pushed
+- [x] **TICKET-001 through TICKET-006** — COMPLETE
+- [ ] **TICKET-007: New Asset Integration + Bug Fix** — IN PROGRESS
 
 ## Open Tickets
-None.
+
+### TICKET-007: Integrate new sprite sheets + fix glitched assets
+**Status:** In Progress  
+**Assignee:** Senior Dev  
+**Description:** User added comprehensive sprite sheets (dungeon-keep-art1.png, dungeon-keep-art2.png) and enemy knight character. Need to extract individual sprites, replace glitched placeholder assets, and integrate into game.  
+**Bugs to Fix:**
+- [ ] Remove/delete tiny placeholder PNGs (100-200 bytes, visual glitches)
+- [ ] Replace with actual extracted sprites from art sheets
+- [ ] Fix any rendering issues with new assets
+**New Assets to Integrate:**
+- [ ] Character sprites: Goblin, Slime, Skeleton, Knight, Paladin, Guild Worker
+- [ ] Dungeon Heart sprite (crystal variant)
+- [ ] Floor/Wall tiles from art sheets
+- [ ] Combat effects (blood, slash)
+- [ ] Enemy knight 8-direction sprite
+- [ ] Items (gold pile for icon)
+**Affected Files:**
+- `assets.py` — load new extracted sprites
+- `renderer.py` — render entities with new sprites
+- Various asset files — delete placeholders, add extracted sprites
 
 ## Recently Completed
-- Fully playable dungeon defense prototype
-- 16 custom dungeon floor tile variations integrated
-- Dungeon master NPC with procedural bob animation
-- Custom UI sprites: buttons, panel, icons, cursors
-- Real-time combat, A* pathfinding, 3-wave spawning
-- Build system: Lair, Trap, Treasury with gold economy
-- Recruitment: Goblin, Slime, Skeleton from Lairs
-- Win/Loss conditions
+- M1-M3 core gameplay
+- TICKET-005/006: first asset integration
 
 ## Blockers
 None.
 
-## Session Handoff Notes
-- All code committed and pushed to `https://github.com/ta-brook/dungeon-keep`
-- To resume: clone repo, `pip install -r requirements.txt`, `python main.py`
-- `state.md` always contains latest status
-- `SPEC.md` contains full game design document
-
-## What You Can Play
-1. `python main.py`
-2. Click title screen to start
-3. Build rooms (Lair/Trap/Treasury) via sidebar buttons
-4. Click Lair → recruit monsters (Goblin/Slime/Skeleton)
-5. Defend against 3 waves of heroes
-6. Spacebar to pause, ESC to cancel
-7. Win: survive all waves. Lose: hero reaches Dungeon Heart.
+## Next Steps
+1. Extract sprites from art1.png and art2.png
+2. Delete glitched placeholder files
+3. Update asset loading code
+4. Update rendering to use new sprites
+5. Test and commit

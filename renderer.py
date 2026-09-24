@@ -116,17 +116,16 @@ class Renderer:
                     else:
                         pygame.draw.rect(self._logical, COLORS["stone_gray"], rect)
                 else:
-                    # Draw colored tile
-                    color = self._tile_color(tile)
-                    pygame.draw.rect(self._logical, color, rect)
+                    # Draw colored tile or sprite
+                    sprite = self._get_tile_sprite(tile)
+                    if sprite:
+                        self._logical.blit(sprite, rect)
+                    else:
+                        color = self._tile_color(tile)
+                        pygame.draw.rect(self._logical, color, rect)
 
                 # Grid border
                 pygame.draw.rect(self._logical, COLORS["void_black"], rect, 1)
-
-                # Draw a small indicator for special tiles
-                if tile == TileType.DUNGEON_HEART:
-                    inner = rect.inflate(-8, -8)
-                    pygame.draw.rect(self._logical, COLORS["gold_yellow"], inner, 2)
 
         # Highlight hovered tile
         if hover_tile:
@@ -139,6 +138,20 @@ class Renderer:
                     pygame.draw.rect(self._logical, COLORS["blood_red"], h_rect, 2)
                 else:
                     pygame.draw.rect(self._logical, COLORS["gold_yellow"], h_rect, 2)
+
+    def _get_tile_sprite(self, tile: TileType) -> Optional[pygame.Surface]:
+        """Get sprite for a tile type if available."""
+        mapping = {
+            TileType.STONE_WALL: "tile_stone_wall",
+            TileType.DUNGEON_HEART: "tile_dungeon_heart",
+            TileType.LAIR: "tile_lair",
+            TileType.TRAP_ROOM: "tile_trap_room",
+            TileType.TREASURY: "tile_treasury",
+        }
+        sprite_id = mapping.get(tile)
+        if sprite_id:
+            return self._assets.get(sprite_id)
+        return None
 
     def _draw_trap_indicators(self, grid: Grid) -> None:
         """Draw warning indicators on tiles adjacent to trap rooms."""
@@ -165,25 +178,54 @@ class Renderer:
         for monster in monsters:
             if not monster.alive:
                 continue
-            self._draw_entity(monster, monster.color)
+            self._draw_entity(monster)
 
         # Draw heroes
         for hero in heroes:
             if not hero.alive:
                 continue
-            self._draw_entity(hero, hero.color)
+            self._draw_entity(hero)
 
-    def _draw_entity(self, entity: Entity, color: tuple) -> None:
-        """Draw a single entity with HP bar."""
-        # Body
-        rect = pygame.Rect(
-            int(entity.x - 8),
-            int(entity.y - 8),
-            16,
-            16,
-        )
-        pygame.draw.rect(self._logical, color, rect)
-        pygame.draw.rect(self._logical, COLORS["void_black"], rect, 1)
+    def _get_entity_sprite(self, entity: Entity) -> Optional[pygame.Surface]:
+        """Get sprite for an entity if available."""
+        if isinstance(entity, Monster):
+            mapping = {
+                "goblin": "unit_goblin_idle",
+                "slime": "unit_slime_idle",
+                "skeleton": "unit_skeleton_idle",
+            }
+            sprite_id = mapping.get(entity.monster_type)
+            if sprite_id:
+                return self._assets.get(sprite_id)
+        elif isinstance(entity, Hero):
+            mapping = {
+                "knight": "unit_hero_knight",
+                "paladin": "unit_hero_paladin",
+            }
+            sprite_id = mapping.get(entity.hero_type)
+            if sprite_id:
+                return self._assets.get(sprite_id)
+        return None
+
+    def _draw_entity(self, entity: Entity) -> None:
+        """Draw a single entity with sprite or colored rectangle fallback."""
+        sprite = self._get_entity_sprite(entity)
+        
+        if sprite:
+            # Center sprite on entity position
+            x = int(entity.x - sprite.get_width() // 2)
+            y = int(entity.y - sprite.get_height() // 2)
+            self._logical.blit(sprite, (x, y))
+        else:
+            # Fallback: colored rectangle
+            rect = pygame.Rect(
+                int(entity.x - 8),
+                int(entity.y - 8),
+                16,
+                16,
+            )
+            pygame.draw.rect(self._logical, entity.color, rect)
+            pygame.draw.rect(self._logical, COLORS["void_black"], rect, 1)
 
         # HP bar background
         hp_bg = pygame.Rect(
@@ -235,6 +277,11 @@ class Renderer:
 
         if cursor_surf:
             self._logical.blit(cursor_surf, mouse_pos)
+        else:
+            # Fallback: simple crosshair
+            x, y = mouse_pos
+            pygame.draw.line(self._logical, COLORS["gold_yellow"], (x - 4, y), (x + 4, y), 1)
+            pygame.draw.line(self._logical, COLORS["gold_yellow"], (x, y - 4), (x, y + 4), 1)
 
     def _tile_color(self, tile: TileType) -> tuple:
         """Return the render color for a tile type."""
