@@ -1,0 +1,242 @@
+{
+  "version": "0.1.0",
+  "tile_size": 32,
+  "scale_factor": 2,
+  "categories": {
+    "tiles": {
+      "path": "assets/tiles/",
+      "items": [
+        {
+          "id": "stone_floor",
+          "file": "tile_stone_floor.png",
+          "size": [32, 32],
+          "frames": 1,
+          "animated": false,
+          "placeholder_color": [74, 74, 74]
+        },
+        {
+          "id": "stone_wall",
+          "file": "tile_stone_wall.png",
+          "size": [32, 32],
+          "frames": 1,
+          "animated": false,
+          "placeholder_color": [43, 43, 43]
+        },
+        {
+          "id": "dungeon_heart",
+          "file": "tile_dungeon_heart.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 2,
+          "loop": "pingpong",
+          "placeholder_color": [138, 43, 226]
+        },
+        {
+          "id": "lair",
+          "file": "tile_lair.png",
+          "size": [32, 32],
+          "frames": 1,
+          "animated": false,
+          "placeholder_color": [61, 92, 58]
+        },
+        {
+          "id": "trap_room",
+          "file": "tile_trap_room.png",
+          "size": [32, 32],
+          "frames": 1,
+          "animated": false,
+          "placeholder_color": [204, 85, 0]
+        },
+        {
+          "id": "treasury",
+          "file": "tile_treasury.png",
+          "size": [32, 32],
+          "frames": 1,
+          "animated": false,
+          "placeholder_color": [255, 215, 0]
+        }
+      ]
+    },
+    "units": {
+      "path": "assets/units/",
+      "items": [
+        {
+          "id": "goblin",
+          "file": "unit_goblin_idle.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 3,
+          "loop": "pingpong",
+          "pivot": "bottom-center",
+          "placeholder_color": [92, 138, 69]
+        },
+        {
+          "id": "slime",
+          "file": "unit_slime_idle.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 2,
+          "loop": "pingpong",
+          "pivot": "bottom-center",
+          "placeholder_color": [107, 191, 71]
+        },
+        {
+          "id": "skeleton",
+          "file": "unit_skeleton_idle.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 2,
+          "loop": "pingpong",
+          "pivot": "bottom-center",
+          "placeholder_color": [212, 212, 212]
+        },
+        {
+          "id": "hero_adventurer",
+          "file": "unit_hero_adventurer.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 4,
+          "loop": "cycle",
+          "pivot": "bottom-center",
+          "placeholder_color": [201, 76, 76]
+        },
+        {
+          "id": "hero_knight",
+          "file": "unit_hero_knight.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 3,
+          "loop": "cycle",
+          "pivot": "bottom-center",
+          "placeholder_color": [138, 155, 184]
+        },
+        {
+          "id": "hero_paladin",
+          "file": "unit_hero_paladin.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 3,
+          "loop": "cycle",
+          "pivot": "bottom-center",
+          "placeholder_color": [212, 175, 55]
+        }
+      ]
+    },
+    "ui": {
+      "path": "assets/ui/",
+      "items": [
+        {
+          "id": "panel",
+          "file": "ui_panel.png",
+          "size": [256, 384],
+          "frames": 1
+        },
+        {
+          "id": "button_default",
+          "file": "ui_button_default.png",
+          "size": [64, 32],
+          "frames": 1
+        },
+        {
+          "id": "button_hover",
+          "file": "ui_button_hover.png",
+          "size": [64, 32],
+          "frames": 1
+        },
+        {
+          "id": "button_disabled",
+          "file": "ui_button_disabled.png",
+          "size": [64, 32],
+          "frames": 1
+        },
+        {
+          "id": "button_pressed",
+          "file": "ui_button_pressed.png",
+          "size": [64, 32],
+          "frames": 1
+        },
+        {
+          "id": "gold_icon",
+          "file": "ui_gold_icon.png",
+          "size": [16, 16],
+          "frames": 1
+        },
+        {
+          "id": "heart_icon",
+          "file": "ui_heart_icon.png",
+          "size": [16, 16],
+          "frames": 1
+        },
+        {
+          "id": "wave_icon",
+          "file": "ui_wave_icon.png",
+          "size": [16, 16],
+          "frames": 1
+        },
+        {
+          "id": "cursor_select",
+          "file": "ui_cursor_select.png",
+          "size": [16, 16],
+          "frames": 1
+        },
+        {
+          "id": "cursor_build",
+          "file": "ui_cursor_build.png",
+          "size": [16, 16],
+          "frames": 1
+        },
+        {
+          "id": "cursor_recruit",
+          "file": "ui_cursor_recruit.png",
+          "size": [16, 16],
+          "frames": 1
+        }
+      ]
+    },
+    "effects": {
+      "path": "assets/effects/",
+      "items": [
+        {
+          "id": "damage",
+          "file": "effect_damage.png",
+          "size": [8, 8],
+          "frames": 1
+        },
+        {
+          "id": "death",
+          "file": "effect_death.png",
+          "size": [16, 16],
+          "frames": 4,
+          "animated": true,
+          "fps": 8,
+          "loop": "once"
+        },
+        {
+          "id": "build",
+          "file": "effect_build.png",
+          "size": [32, 32],
+          "frames": 4,
+          "animated": true,
+          "fps": 10,
+          "loop": "once"
+        },
+        {
+          "id": "trap_spike",
+          "file": "effect_trap_spike.png",
+          "size": [32, 32],
+          "frames": 2,
+          "animated": true,
+          "fps": 4,
+          "loop": "pingpong"
+        }
+      ]
+    }
+  }
+}
