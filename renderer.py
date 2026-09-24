@@ -199,8 +199,9 @@ class Renderer:
                 return self._assets.get(sprite_id)
         elif isinstance(entity, Hero):
             mapping = {
-                "knight": "unit_hero_knight",
-                "paladin": "unit_hero_paladin",
+                "adventurer": "hero_knight",
+                "knight": "hero_knight",
+                "paladin": "hero_paladin",
             }
             sprite_id = mapping.get(entity.hero_type)
             if sprite_id:
