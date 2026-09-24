@@ -518,6 +518,11 @@ class Renderer:
 - `state.md` is the handoff document for continuing work in a new session.
 - Keep it concise but complete enough that a fresh session can pick up without context loss.
 
+### 12.3 Commit and Push
+- **After every meaningful change** (feature completion, bug fix, milestone boundary, or session end): commit with a descriptive message.
+- **After every commit:** push to the remote repository (`git push origin main`).
+- **Never leave unpushed commits** at the end of a session.
+
 ## 13. Changelog
 
 | Date | Version | Author | Changes |

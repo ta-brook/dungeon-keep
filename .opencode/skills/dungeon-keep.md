@@ -135,6 +135,7 @@ class Button:
 ## Interaction Rules
 
 - **Always ask in interactive mode:** When clarifying requirements, making design choices, or requesting user decisions, use the interactive `question` tool with multiple-choice options. Do not ask open-ended text questions unless no choices can be provided.
+- **Always commit and push:** After every meaningful change (feature completion, bug fix, milestone boundary, or session end), commit with a descriptive message and push to the remote repository immediately. Never leave unpushed commits at the end of a session.
 
 ## Constraints & Non-Goals
 
