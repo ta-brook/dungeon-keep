@@ -1,9 +1,11 @@
 """Rendering system: all draw calls, camera, and scaling."""
 
+import math
 from typing import List, Optional
 
 import pygame
 
+from assets import AssetRegistry
 from constants import (
     COLORS,
     GRID_HEIGHT,
@@ -24,13 +26,20 @@ from ui import UI
 class Renderer:
     """Handles all rendering to the screen."""
 
-    def __init__(self, display_surface: pygame.Surface, scale: int = SCALE_FACTOR) -> None:
+    def __init__(
+        self,
+        display_surface: pygame.Surface,
+        assets: AssetRegistry,
+        scale: int = SCALE_FACTOR,
+    ) -> None:
         self._display = display_surface
+        self._assets = assets
         self._scale = scale
         self._logical = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self._font_large = pygame.font.SysFont("monospace", 24)
         self._font_medium = pygame.font.SysFont("monospace", 16)
         self._font_small = pygame.font.SysFont("monospace", 12)
+        self._time = 0.0
 
     def clear(self) -> None:
         """Clear the logical frame."""
@@ -67,11 +76,14 @@ class Renderer:
         hover_tile: Optional[tuple] = None,
         build_valid: Optional[bool] = None,
         wave_info: str = "",
+        dt: float = 0.0,
     ) -> None:
         """Draw the play area and sidebar."""
+        self._time += dt
         self._draw_grid(grid, hover_tile, build_valid)
         self._draw_trap_indicators(grid)
         self._draw_entities(monsters, heroes)
+        self._draw_dungeon_master(grid)
         ui.draw(self._logical)
 
         # Wave info
@@ -86,12 +98,26 @@ class Renderer:
         build_valid: Optional[bool] = None,
     ) -> None:
         """Render the tile grid in the play area."""
+        has_floor_assets = self._assets.has_floor_variants()
+
         for y in range(grid.height):
             for x in range(grid.width):
                 tile = grid.get_tile(x, y)
-                color = self._tile_color(tile)
                 rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                pygame.draw.rect(self._logical, color, rect)
+
+                if tile == TileType.STONE_FLOOR and has_floor_assets:
+                    # Draw floor variant
+                    floor_surf = self._assets.get_random_floor()
+                    if floor_surf:
+                        self._logical.blit(floor_surf, rect)
+                    else:
+                        pygame.draw.rect(self._logical, COLORS["stone_gray"], rect)
+                else:
+                    # Draw colored tile
+                    color = self._tile_color(tile)
+                    pygame.draw.rect(self._logical, color, rect)
+
+                # Grid border
                 pygame.draw.rect(self._logical, COLORS["void_black"], rect, 1)
 
                 # Draw a small indicator for special tiles
@@ -177,6 +203,22 @@ class Renderer:
             )
             hp_color = COLORS["slime_green"] if hp_ratio > 0.5 else COLORS["trap_orange"] if hp_ratio > 0.25 else COLORS["blood_red"]
             pygame.draw.rect(self._logical, hp_color, hp_fill)
+
+    def _draw_dungeon_master(self, grid: Grid) -> None:
+        """Draw the dungeon master NPC near the Dungeon Heart with bob animation."""
+        dm_surf = self._assets.get_dungeon_master()
+        if not dm_surf:
+            return
+
+        heart = grid.find_dungeon_heart()
+        # Place DM one tile below the heart
+        dm_x = heart[0] * TILE_SIZE
+        dm_y = heart[1] * TILE_SIZE + TILE_SIZE
+
+        # Bob animation: offset y by 0-2 pixels using sine wave
+        bob_offset = int(math.sin(self._time * 3) * 2)
+
+        self._logical.blit(dm_surf, (dm_x, dm_y + bob_offset))
 
     def _tile_color(self, tile: TileType) -> tuple:
         """Return the render color for a tile type."""

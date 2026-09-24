@@ -1,0 +1,584 @@
+{
+  "objects": [
+    {
+      "id": "f43bc50f-5af5-43e4-bd08-be44690f1c6d",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "ea50f3ff-a38f-425c-b51c-2b888c28eeca",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_2.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "ea084cc2-cfe8-44c0-9970-db4a8c62ce0a",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_3.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "defd04d8-4556-4e9d-aa92-82621e152f7a",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_4.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "d3381c18-f6b8-4cb9-b6ac-9b06f9cdc33c",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_5.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "c755bbf1-e449-49ab-bb9d-b0b40847a54a",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_6.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "c12237d3-09ad-4ae1-99f3-5cd22e6d9397",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_7.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "bebd2816-f7bd-4e71-a4f4-dd75b695e2a1",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_8.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "aa2a76a4-75c8-407e-b32b-0d0020250aa1",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_9.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "a2b17bd0-85cd-41fe-be58-97d51342fa7c",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_10.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "96649f23-9094-49c0-81e2-5753226f660d",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_11.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "87219661-7dda-424c-9113-faf1a5933640",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_12.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "5f7f1985-be5d-4525-8b81-2afabb694819",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_13.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "40ad714b-95ef-4cad-8b22-ec6014f263d7",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_14.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "217e9e50-6cc6-426b-9ebb-599cb8104dd7",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_15.png"
+      },
+      "animations": {}
+    },
+    {
+      "id": "1370c551-077a-4930-af96-ebd8eaaedb97",
+      "name": "base",
+      "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "directions": 1,
+      "view": "low top-down",
+      "rotations": {
+        "unknown": "rotations/dungeon_that_full_with_monster_16.png"
+      },
+      "animations": {}
+    }
+  ],
+  "groups": [
+    {
+      "group_id": "6359b2f1-4208-40a7-8334-243a791f7bdb",
+      "folder": "objects/dungeon_that_full_with_monster",
+      "objects": [
+        {
+          "id": "f43bc50f-5af5-43e4-bd08-be44690f1c6d",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "7f189e28-503c-4e15-a56f-0791dbf2c9a0",
+      "folder": "objects/dungeon_that_full_with_monster_2",
+      "objects": [
+        {
+          "id": "ea50f3ff-a38f-425c-b51c-2b888c28eeca",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_2.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "517e2dc2-adaf-4bce-8c40-943a2da6d215",
+      "folder": "objects/dungeon_that_full_with_monster_3",
+      "objects": [
+        {
+          "id": "ea084cc2-cfe8-44c0-9970-db4a8c62ce0a",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_3.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "25cefb24-3570-471c-8ff3-178056b6f7b2",
+      "folder": "objects/dungeon_that_full_with_monster_4",
+      "objects": [
+        {
+          "id": "defd04d8-4556-4e9d-aa92-82621e152f7a",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_4.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "d8e95bc7-83d7-477b-9782-176176d9eb53",
+      "folder": "objects/dungeon_that_full_with_monster_5",
+      "objects": [
+        {
+          "id": "d3381c18-f6b8-4cb9-b6ac-9b06f9cdc33c",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_5.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "96c7c769-4c3d-4a98-b235-2cf9acca46c3",
+      "folder": "objects/dungeon_that_full_with_monster_6",
+      "objects": [
+        {
+          "id": "c755bbf1-e449-49ab-bb9d-b0b40847a54a",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_6.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "89077c92-9ed9-4afc-bb3f-cff58c9de2ee",
+      "folder": "objects/dungeon_that_full_with_monster_7",
+      "objects": [
+        {
+          "id": "c12237d3-09ad-4ae1-99f3-5cd22e6d9397",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_7.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "ff43a0f0-01be-45f8-bced-1eef8583a452",
+      "folder": "objects/dungeon_that_full_with_monster_8",
+      "objects": [
+        {
+          "id": "bebd2816-f7bd-4e71-a4f4-dd75b695e2a1",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_8.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "fc94018c-b239-4583-944b-3217d44dbd8a",
+      "folder": "objects/dungeon_that_full_with_monster_9",
+      "objects": [
+        {
+          "id": "aa2a76a4-75c8-407e-b32b-0d0020250aa1",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_9.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "1342feb5-5b1f-4097-950e-114e657d359c",
+      "folder": "objects/dungeon_that_full_with_monster_10",
+      "objects": [
+        {
+          "id": "a2b17bd0-85cd-41fe-be58-97d51342fa7c",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_10.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "74571075-b552-46aa-8202-62a4f4e468fc",
+      "folder": "objects/dungeon_that_full_with_monster_11",
+      "objects": [
+        {
+          "id": "96649f23-9094-49c0-81e2-5753226f660d",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_11.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "322a2cd6-d898-462a-9bc4-1126fddcd6d2",
+      "folder": "objects/dungeon_that_full_with_monster_12",
+      "objects": [
+        {
+          "id": "87219661-7dda-424c-9113-faf1a5933640",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_12.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "7692581a-8ab3-4968-a39c-67c81a4df436",
+      "folder": "objects/dungeon_that_full_with_monster_13",
+      "objects": [
+        {
+          "id": "5f7f1985-be5d-4525-8b81-2afabb694819",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_13.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "9f1c9bf2-db90-4f1b-8cb5-48858129502d",
+      "folder": "objects/dungeon_that_full_with_monster_14",
+      "objects": [
+        {
+          "id": "40ad714b-95ef-4cad-8b22-ec6014f263d7",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_14.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "da635b36-bd9a-4afe-877e-df35403c05cf",
+      "folder": "objects/dungeon_that_full_with_monster_15",
+      "objects": [
+        {
+          "id": "217e9e50-6cc6-426b-9ebb-599cb8104dd7",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_15.png"
+          },
+          "animations": {}
+        }
+      ]
+    },
+    {
+      "group_id": "8d4ad2ec-fd84-41ec-8cdd-875f5991db26",
+      "folder": "objects/dungeon_that_full_with_monster_16",
+      "objects": [
+        {
+          "id": "1370c551-077a-4930-af96-ebd8eaaedb97",
+          "name": "base",
+          "prompt": "dungeon that full with monster feel old but fancy and lighter enough to see this dungeon will be use as a town for monster and defend against human ",
+          "size": {
+            "width": 48,
+            "height": 48
+          },
+          "directions": 1,
+          "view": "low top-down",
+          "rotations": {
+            "unknown": "rotations/dungeon_that_full_with_monster_16.png"
+          },
+          "animations": {}
+        }
+      ]
+    }
+  ],
+  "export_version": "1.1",
+  "export_date": "2026-09-24T14:29:05.701481"
+}

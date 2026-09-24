@@ -1,6 +1,7 @@
 """Tile map and pathfinding."""
 
 import heapq
+import random
 from typing import List, Optional, Tuple
 
 from constants import GRID_HEIGHT, GRID_WIDTH, TileType
@@ -14,6 +15,9 @@ class Grid:
         self.height = height
         self._tiles: List[List[TileType]] = [
             [TileType.STONE_FLOOR for _ in range(width)] for _ in range(height)
+        ]
+        self._floor_variants: List[List[int]] = [
+            [random.randint(0, 15) for _ in range(width)] for _ in range(height)
         ]
         self._setup_boundary_walls()
         self._place_dungeon_heart()
@@ -60,6 +64,12 @@ class Grid:
         """Set the tile type at grid coordinates."""
         if self.in_bounds(x, y):
             self._tiles[y][x] = tile_type
+
+    def get_floor_variant(self, x: int, y: int) -> int:
+        """Get the floor tile variation index at grid coordinates."""
+        if not self.in_bounds(x, y):
+            return 0
+        return self._floor_variants[y][x]
 
     def find_dungeon_heart(self) -> Tuple[int, int]:
         """Find the Dungeon Heart coordinates."""

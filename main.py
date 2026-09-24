@@ -38,7 +38,7 @@ def main() -> None:
     grid = Grid()
     build_system = BuildSystem(grid)
     ui = UI(build_system)
-    renderer = Renderer(screen)
+    renderer = Renderer(screen, assets)
     input_handler = InputHandler()
     wave_manager = WaveManager(grid)
 
@@ -203,6 +203,7 @@ def main() -> None:
                 hover_tile=hovered_tile,
                 build_valid=build_valid,
                 wave_info=wave_info,
+                dt=dt,
             )
 
             if state_machine.state == GameState.PAUSED:
