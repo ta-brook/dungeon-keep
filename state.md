@@ -1,79 +1,144 @@
 # Dungeon Keep — Session State
 
-## Design Pivot
-**2026-09-25** — Project pivoted to Evil Hunter Tycoon × Dungeon Maker × Creator Chronicles hybrid. See `DESIGN_VISION.md` for full vision. `SPEC.md` updated with new milestones.
+## Design Pivot v2 (2026-09-25)
+**Source:** `game-direction-v2.md` — New core fantasy: *"Build a living dungeon. Recruit monsters. Set up defenses. Then watch adventurers invade and try to survive your dungeon."*
+
+**Key shift:** Strip guild/crafting/trading from MVP. Focus entirely on **dungeon layout + room synergies + auto-combat**. The dungeon itself is the character.
 
 ---
 
 ## Current Milestone
 **M2: Room-Based Defense (Dungeon Maker Core)** — IN PROGRESS 🔄
 
-## Latest Changes (this session)
-- **Grid resized:** 16×12 (32px tiles) → **6×4 (72px tiles)** — big room blocks like Dungeon Maker
-- **Grid centered** in play area with 40px horizontal / 48px vertical margin
-- **Entrance** at left edge (0, 2), **Dungeon Heart** at right edge (5, 2)
-- **Hero speeds** slowed to 0.5/0.4/0.3 tiles/s for more tactical build time
-- **8-second prep phase** before wave 1 starts
+---
 
 ## Progress
 - [x] **M1:** Skeleton (Architecture & Rendering) — COMPLETE
-- [x] **M2 Pre-work:** Button scaling fix, restart on win/loss, trap damage fix, discrete hero movement
-- [x] **M2 Design:** `DESIGN_VISION.md` written, `SPEC.md` milestones updated
-- [x] **TICKET-009:** Entrance tile added (left edge), heroes spawn at Entrance and path to Heart
-- [x] **TICKET-010:** Monster AI refactored — stationary in rooms, only attack heroes in same tile
-- [x] **TICKET-011:** Traps refactored — trigger when hero walks ON trap tile (not adjacent)
-- [x] **TICKET-012:** Renderer updated for Entrance tile, trap indicators moved to trap tile, heart HP bar added
-- [x] Dungeon Heart HP system added (100 HP, heroes deal damage when on heart tile)
+- [x] **M2 Core:** Entrance tile, linear hero path, stationary monsters, traps on walk-over
+- [x] **Grid resize:** 6×4 with 72px tiles (big room blocks)
+- [x] **Balance:** Hero speeds 0.5/0.4/0.3 tiles/s, 8s prep phase before wave 1
+- [x] **Bug fix:** Heroes can walk through rooms (pathfinding no longer blocked by Lair/Trap/Treasury)
+- [x] **Bug fix:** A* fallback uses Manhattan-stepped path
+- [x] `game-direction-v2.md` written — full design direction for MVP
 
-## Open Tickets
-- **TICKET-013:** Smoke test M2 — run game, verify heroes walk Entrance→Heart, monsters defend rooms, traps trigger on walk-over, heart takes damage
-- **TICKET-014:** Balance pass — monster/hero stats, trap damage, heart HP, wave difficulty
+---
+
+## What's Working Now
+1. `python main.py`
+2. Title screen → click to start → 8s prep countdown ("Prep: Xs")
+3. **6×4 grid of large 72px tiles**
+4. Build Lair / Trap / Treasury on big room blocks
+5. Click Lair → recruit Goblin / Slime / Skeleton
+6. Heroes spawn at brown ENTRANCE (left edge) and march toward Dungeon Core (right edge)
+7. Monsters are **stationary** — they fight heroes who enter their tile
+8. Traps trigger when hero **walks ON** the trap tile
+9. Heroes deal damage to Dungeon Core (100 HP) when they reach it
+10. Win/loss screens, Enter to restart
+
+---
+
+## What Makes It Boring Right Now
+- **No player agency during combat** — just watch
+- **No room synergies** — a Slime in a Trap tile is the same as a Slime anywhere
+- **No monster abilities** — just HP/damage/attack speed
+- **Auto-start waves** — player can't choose when ready
+- **No progression between waves** — monsters auto-heal, no loot, no upgrades
+- **Heroes are generic** — no party composition, no roles
+
+---
+
+## v2 MVP Scope (from `game-direction-v2.md`)
+
+### Monsters (3 types)
+| Monster | Role | Ability |
+|---------|------|---------|
+| 🟢 Slime | Tank / Slow | Slows enemies in same room |
+| 👺 Goblin | Basic DPS | Attacks quickly |
+| ☠️ Skeleton | Durable DPS | Revives once at 50% HP |
+
+### Heroes (3 types)
+| Hero | Role | Ability |
+|------|------|---------|
+| 🛡️ Knight | Tank | High HP |
+| 🏹 Archer | Ranged | Attacks from distance |
+| 🧙 Mage | AoE | Damages multiple monsters |
+
+### Rooms (6 types)
+| Room | Function |
+|------|----------|
+| Spike Trap | Damages first hero entering |
+| Slime Pool | Slimes here slow enemies by 50% |
+| Goblin Den | Goblins here attack 2× faster |
+| Skeleton Crypt | Skeletons here revive once at 50% HP |
+| Treasure Room | (passive gold?) |
+| Dungeon Core | If destroyed, game over |
+
+### Core Loop
+```
+BUILD → RECRUIT → ARRANGE → START INVASION → AUTO COMBAT → LOOT → UPGRADE → REPEAT
+```
+
+### Waves (5 total)
+1. Knight
+2. Knight + Archer
+3. Knight + Archer + Mage
+4. 2 Knights + Archer
+5. Full party
+
+### One Emergency Ability
+🔮 **Dark Magic** — Click an enemy → deal 30 damage, 10s cooldown
+
+---
+
+## Open Decisions (Pending User Input)
+
+### 1. Grid Size
+- **A.** Keep 6×4 — tight, tactical
+- **B.** Widen to 8×4 or 10×4 — longer gauntlet, more combos
+
+### 2. Monsters Per Room
+- **A.** 1 monster per tile (current)
+- **B.** Each tile is a "room" holding 1–3 monsters
+
+### 3. Between Waves
+- **A.** Instant — auto-heal, gold awarded, "Next Wave" button appears
+- **B.** Relaxed — player clicks "Next Invasion" when ready
+
+### 4. Strip or Hide Old Code
+- **A.** Strip guild/crafting/trading code now (cleaner)
+- **B.** Hide them (comment out) — keep for later
+
+### 5. Room Count for First Playable
+- **A.** All 6 room types at once
+- **B.** Start with fewer (Trap + 3 monster rooms), add rest later
+
+---
 
 ## Recently Completed
-- Fixed UI button scaling (SCALE_FACTOR bug in `ui.py`)
-- Added restart on Enter key for win/loss screens
-- Fixed trap damage (fractional accumulation)
-- Changed hero movement to discrete tile steps
-- Fixed hero teleport bug (A* to unwalkable Dungeon Heart + safety clamp)
-- Wrote `DESIGN_VISION.md` and updated `SPEC.md`
-- **M2 Implementation:**
-  - `constants.py`: Added `ENTRANCE` TileType + color
-  - `grid.py`: `_place_entrance()` on left edge, `find_entrance()`, `is_walkable` includes ENTRANCE
-  - `waves.py`: Heroes spawn at `find_entrance()` instead of random edges
-  - `entities.py`: `Monster.update()` stripped of movement — monsters are now stationary
-  - `combat.py`: Monster/hero combat range reduced to 0.5 (same tile only); trap damage triggers on hero.grid_x == trap_x and hero.grid_y == trap_y
-  - `main.py`: Added `dungeon_heart_hp` tracking (100 max), heroes damage heart when on tile
-  - `renderer.py`: Draws ENTRANCE tile, trap indicators on trap tiles, heart HP bar above heart
-- **Balance fix:** Hero speeds reduced to 0.5/0.4/0.3 tiles/s; added 8s prep phase before wave 1
-- **Bug fix:** `is_walkable()` now allows all non-wall tiles (rooms are walkable like Dungeon Maker)
-- **Bug fix:** A* fallback uses Manhattan-stepped path; hero movement safety clamp improved
+- `game-direction-v2.md` — full v2 design direction
+- Grid resize to 6×4 with 72px tiles
+- Hero speed balance + prep phase
+- Pathfinding bug fixes
 
 ## Blockers
 - None.
 
 ## Session Handoff Notes
-- All code committed and pushed
+- All code committed and pushed to `https://github.com/ta-brook/dungeon-keep`
 - To resume: clone repo, `pip install -r requirements.txt`, `python main.py`
-- New design doc: `DESIGN_VISION.md`
-- Updated spec: `SPEC.md` Section 10
+- Design docs: `DESIGN_VISION.md` (original hybrid), `game-direction-v2.md` (stripped MVP)
+- `SPEC.md` contains old milestone structure — needs updating for v2
 
-## What You Can Play Now (M2 Core)
-1. `python main.py`
-2. Title screen → click to start
-3. **6×4 grid of large 72px tiles** — build Lair / Trap / Treasury on big room blocks
-4. Click Lair → recruit Goblin / Slime / Skeleton (monster spawns IN the Lair, stationary)
-5. Heroes spawn at brown ENTRANCE tile (left edge) and march tile-by-tile toward Dungeon Heart
-6. When a hero enters a tile with a monster, combat begins (both attack each other)
-7. When a hero walks ON a Trap tile, they take 5 DPS
-8. If heroes reach the Dungeon Heart, they damage it (100 HP total)
-9. **8-second prep phase** before wave 1 starts (shown as "Prep: Xs" on screen)
-10. Win/loss screens with Enter to restart
-11. **Monsters no longer chase** — they only fight in their assigned room
-
-## Next Steps
-1. **TICKET-013:** Smoke test M2 gameplay
-2. **TICKET-014:** Balance pass
-3. **M3:** Day/Night cycle
+## Next Steps (when resuming)
+1. Get user answers to **5 Open Decisions** above
+2. Update `SPEC.md` with v2 MVP milestones
+3. Implement v2 MVP core:
+   - Manual "Defend" button (replace auto-start)
+   - Room synergies (Slime slow, Goblin fast, Skeleton revive)
+   - Dark Magic emergency ability
+   - 5 waves with party composition
+   - Post-invasion loot + upgrade loop
+4. Smoke test for fun
 
 ## Date: 2026-09-25
-## Session: M2 Implementation — Room-Based Defense Core
+## Session: Design pivot v2 + M2 core implementation + v2 planning
