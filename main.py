@@ -233,9 +233,12 @@ def main() -> None:
         if state_machine.state == GameState.MENU:
             renderer.draw_menu()
         else:
-            wave_info = f"Wave: {wave_manager.current_wave}/{wave_manager.total_waves}"
-            if wave_manager.all_waves_complete:
+            if wave_manager.in_prep:
+                wave_info = f"Prep: {int(wave_manager.prep_time_remaining)}s"
+            elif wave_manager.all_waves_complete:
                 wave_info = "All waves complete!"
+            else:
+                wave_info = f"Wave: {wave_manager.current_wave}/{wave_manager.total_waves}"
 
             renderer.draw_game(
                 grid,

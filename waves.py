@@ -1,5 +1,6 @@
 """Wave definitions and spawning logic."""
 
+import random
 from typing import List, Tuple
 
 from constants import GRID_HEIGHT, GRID_WIDTH, SPAWN_INTERVAL, WAVES
@@ -10,7 +11,7 @@ from grid import Grid
 class WaveManager:
     """Manages hero wave spawning."""
 
-    def __init__(self, grid: Grid) -> None:
+    def __init__(self, grid: Grid, prep_time: float = 8.0) -> None:
         self._grid = grid
         self._wave_index = 0
         self._spawn_queue: List[str] = []
@@ -18,6 +19,8 @@ class WaveManager:
         self._wave_cooldown = 0.0
         self._wave_active = False
         self._all_waves_complete = False
+        self._prep_time = prep_time
+        self._prep_timer = prep_time
 
     @property
     def current_wave(self) -> int:
@@ -38,6 +41,16 @@ class WaveManager:
     def wave_active(self) -> bool:
         """Return True if currently spawning a wave."""
         return self._wave_active
+
+    @property
+    def in_prep(self) -> bool:
+        """Return True if in prep phase before first wave."""
+        return self._wave_index == 0 and not self._wave_active and not self._all_waves_complete
+
+    @property
+    def prep_time_remaining(self) -> float:
+        """Seconds remaining in prep phase."""
+        return max(0.0, self._prep_timer)
 
     def start_next_wave(self) -> None:
         """Start the next wave if available."""
@@ -61,9 +74,11 @@ class WaveManager:
         spawned: List[Hero] = []
 
         if not self._wave_active:
-            # Start first wave automatically, then wait for cooldown
+            # Prep phase before first wave
             if self._wave_index == 0 and not self._all_waves_complete:
-                self.start_next_wave()
+                self._prep_timer -= dt
+                if self._prep_timer <= 0:
+                    self.start_next_wave()
             return spawned
 
         if not self._spawn_queue:

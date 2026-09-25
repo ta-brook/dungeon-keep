@@ -49,9 +49,9 @@ MONSTER_STATS = {
 
 # Hero stats (HP, Damage, Attack Speed, Move Speed in tiles/s)
 HERO_STATS = {
-    "adventurer": {"hp": 40, "damage": 5, "attack_speed": 1.0, "move_speed": 1.5},
-    "knight": {"hp": 80, "damage": 8, "attack_speed": 0.8, "move_speed": 1.2},
-    "paladin": {"hp": 150, "damage": 12, "attack_speed": 0.6, "move_speed": 1.0},
+    "adventurer": {"hp": 40, "damage": 5, "attack_speed": 1.0, "move_speed": 0.5},
+    "knight": {"hp": 80, "damage": 8, "attack_speed": 0.8, "move_speed": 0.4},
+    "paladin": {"hp": 150, "damage": 12, "attack_speed": 0.6, "move_speed": 0.3},
 }
 
 # Wave definitions: list of (hero_type, count)
