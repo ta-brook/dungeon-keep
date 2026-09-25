@@ -160,14 +160,21 @@ class Hero(Entity):
             self.move_timer -= dt
             if self.move_timer <= 0:
                 next_tile = self.path[1]
-                # Safety: only move to adjacent tiles (prevents fallback jump bugs)
-                if abs(self.grid_x - next_tile[0]) <= 1 and abs(self.grid_y - next_tile[1]) <= 1:
-                    # Snap instantly to the next tile
-                    self.grid_x = next_tile[0]
-                    self.grid_y = next_tile[1]
-                    self.x = self.grid_x * TILE_SIZE + TILE_SIZE // 2
-                    self.y = self.grid_y * TILE_SIZE + TILE_SIZE // 2
+                # Move to next tile (always adjacent in a valid path)
+                # If not adjacent, step one tile toward it as a safety fallback
+                dx = max(-1, min(1, next_tile[0] - self.grid_x))
+                dy = max(-1, min(1, next_tile[1] - self.grid_y))
+                self.grid_x += dx
+                self.grid_y += dy
+                self.x = self.grid_x * TILE_SIZE + TILE_SIZE // 2
+                self.y = self.grid_y * TILE_SIZE + TILE_SIZE // 2
+
+                # Remove the tile we just left from the path
                 self.path.pop(0)
+                # If we landed on what was path[1], it's now path[0] — remove it too
+                if self.path and self.grid_x == self.path[0][0] and self.grid_y == self.path[0][1]:
+                    self.path.pop(0)
+
                 self.move_timer = 1.0 / self.move_speed
 
                 # Face the next upcoming tile (if any)

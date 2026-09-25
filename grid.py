@@ -51,11 +51,16 @@ class Grid:
         return 0 <= x < self.width and 0 <= y < self.height
 
     def is_walkable(self, x: int, y: int) -> bool:
-        """Return True if heroes/monsters can walk on this tile."""
+        """Return True if heroes/monsters can walk on this tile.
+        
+        All room types are walkable — heroes walk through traps (taking damage),
+        halt in battle rooms to fight monsters, and pass through treasuries.
+        Only walls block movement.
+        """
         if not self.in_bounds(x, y):
             return False
         tile = self._tiles[y][x]
-        return tile in {TileType.STONE_FLOOR, TileType.DUNGEON_HEART, TileType.ENTRANCE}
+        return tile != TileType.STONE_WALL
 
     def is_buildable(self, x: int, y: int) -> bool:
         """Return True if a room can be built here."""
@@ -128,8 +133,23 @@ class Grid:
                         heapq.heappush(open_set, (f_score[neighbor], neighbor))
                         open_set_hash.add(neighbor)
 
-        # No path found — return straight line fallback
-        return [start, end]
+        # No path found — return a Manhattan-stepped fallback
+        return self._manhattan_path(start, end)
+
+    def _manhattan_path(
+        self, start: Tuple[int, int], end: Tuple[int, int]
+    ) -> List[Tuple[int, int]]:
+        """Build a tile-by-tile path moving horizontally then vertically."""
+        path = [start]
+        x, y = start
+        tx, ty = end
+        while x != tx:
+            x += 1 if tx > x else -1
+            path.append((x, y))
+        while y != ty:
+            y += 1 if ty > y else -1
+            path.append((x, y))
+        return path
 
     def _heuristic(self, a: Tuple[int, int], b: Tuple[int, int]) -> int:
         """Manhattan distance heuristic."""
