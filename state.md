@@ -45,6 +45,8 @@
   - `main.py`: Added `dungeon_heart_hp` tracking (100 max), heroes damage heart when on tile
   - `renderer.py`: Draws ENTRANCE tile, trap indicators on trap tiles, heart HP bar above heart
 - **Balance fix:** Hero speeds reduced to 0.5/0.4/0.3 tiles/s; added 8s prep phase before wave 1
+- **Bug fix:** `is_walkable()` now allows all non-wall tiles (rooms are walkable like Dungeon Maker)
+- **Bug fix:** A* fallback uses Manhattan-stepped path; hero movement safety clamp improved
 
 ## Blockers
 - None.
