@@ -8,6 +8,13 @@
 ## Current Milestone
 **M2: Room-Based Defense (Dungeon Maker Core)** — IN PROGRESS 🔄
 
+## Latest Changes (this session)
+- **Grid resized:** 16×12 (32px tiles) → **6×4 (72px tiles)** — big room blocks like Dungeon Maker
+- **Grid centered** in play area with 40px horizontal / 48px vertical margin
+- **Entrance** at left edge (0, 2), **Dungeon Heart** at right edge (5, 2)
+- **Hero speeds** slowed to 0.5/0.4/0.3 tiles/s for more tactical build time
+- **8-second prep phase** before wave 1 starts
+
 ## Progress
 - [x] **M1:** Skeleton (Architecture & Rendering) — COMPLETE
 - [x] **M2 Pre-work:** Button scaling fix, restart on win/loss, trap damage fix, discrete hero movement
@@ -51,7 +58,7 @@
 ## What You Can Play Now (M2 Core)
 1. `python main.py`
 2. Title screen → click to start
-3. Build Lair / Trap / Treasury on grid
+3. **6×4 grid of large 72px tiles** — build Lair / Trap / Treasury on big room blocks
 4. Click Lair → recruit Goblin / Slime / Skeleton (monster spawns IN the Lair, stationary)
 5. Heroes spawn at brown ENTRANCE tile (left edge) and march tile-by-tile toward Dungeon Heart
 6. When a hero enters a tile with a monster, combat begins (both attack each other)
