@@ -519,9 +519,12 @@ if distance(attacker, target) <= attacker.range and attacker.cooldown <= 0:
 
 ## 8. File Structure
 
+Every release version of the game **must** include a `manual.md` at the repository root. This file documents controls, UI flow, and any gameplay mechanics specific to that version so players (and testers) can pick up the game without reading the full spec.
+
 ```
 dungeon-keep/
 ├── SPEC.md                  # This document
+├── manual.md                # Player-facing controls & gameplay guide (required per version)
 ├── README.md                # Setup and run instructions
 ├── requirements.txt         # Python dependencies (pygame, pygbag)
 ├── main.py                  # Entry point, game loop, state machine
@@ -1052,141 +1055,152 @@ class Camera:
     def clamp(self, world_width: int, world_height: int) -> None: ...
 ```
 
-## 10. Milestones & Acceptance Criteria
+## 10. Milestones & Acceptance Criteria (Refined Vision)
 
-### Milestone 1: Skeleton (Architecture & Rendering)
+> **Design basis:** `DESIGN_VISION.md` — Evil Hunter Tycoon × Dungeon Maker × Creator Chronicles
+
+---
+
+### Milestone 1: Skeleton (Architecture & Rendering) ✅ COMPLETE
 **Goal:** A running window with a grid, clickable tiles, and placeholder colored rectangles.
 
 **AC:**
-- [ ] Window opens at 768x384 (scaled to 1536x768)
-- [ ] 16x12 grid renders with distinct colors for floor and wall
-- [ ] Dungeon Heart placed at center
-- [ ] Left-clicking a tile logs its coordinates
-- [ ] Game loop runs at stable 60 FPS
-- [ ] Title screen → Game screen transition works
-- [ ] `assets/` directory exists with placeholder PNGs (colored squares)
+- [x] Window opens at 768x384 (scaled to 1536x768)
+- [x] 16x12 grid renders with distinct colors for floor and wall
+- [x] Dungeon Heart placed at center
+- [x] Left-clicking a tile logs its coordinates
+- [x] Game loop runs at stable 60 FPS
+- [x] Title screen → Game screen transition works
+- [x] `assets/` directory exists with placeholder PNGs (colored squares)
 
 **Est. Effort:** Senior Dev — 1 session
 
 ---
 
-### Milestone 2: Build & Economy
-**Goal:** Player can build rooms and gold is tracked.
+### Milestone 2: Room-Based Defense (Dungeon Maker Core)
+**Goal:** Monsters are stationary in Battle Rooms; heroes walk a gauntlet from fixed Entrance to Dungeon Heart.
 
 **AC:**
-- [ ] Sidebar UI renders with build buttons
-- [ ] Clicking a build button enters "build mode"
-- [ ] Clicking a valid floor tile places the room and deducts gold
-- [ ] Invalid tiles (walls, occupied, insufficient gold) reject with visual feedback
-- [ ] Treasury passively generates gold
-- [ ] Gold counter updates in real-time
-- [ ] Trap room shows visual indicator on adjacent tiles
+- [ ] Add `ENTRANCE` tile (left edge, fixed spawn point for heroes)
+- [ ] Heroes path Entrance → Dungeon Heart in a linear corridor
+- [ ] Rename `LAIR` to `BATTLE_ROOM`; monsters are assigned to rooms (1–3 per room)
+- [ ] Monsters do NOT move; they attack heroes who enter their tile
+- [ ] If all monsters in a Battle Room die, room is "overrun" — heroes walk through
+- [ ] Trap Rooms trigger when hero **walks onto** the trap tile (not adjacent)
+- [ ] Heroes move tile-by-tile at fixed speed (already implemented)
+- [ ] Win/Loss: Dungeon Heart has HP; reaching 0 = loss. Survive all nights = win.
 
-**Est. Effort:** Senior Dev — 1 session
+**Est. Effort:** Senior Dev — 1–2 sessions | Designer — room sprites, entrance sprite
 
 ---
 
-### Milestone 3: Units & Combat
-**Goal:** Monsters and heroes exist, fight, and die.
+### Milestone 3: Day/Night Cycle
+**Goal:** Explicit Day (build) → Night (defend) → Dawn (recover) loop.
 
 **AC:**
-- [ ] Clicking a Lair opens recruit menu
-- [ ] Recruiting spawns monster at Lair location
-- [ ] Heroes spawn at map edge and move toward Dungeon Heart
-- [ ] Heroes path around walls and rooms
-- [ ] Monsters aggro heroes within 3 tiles
-- [ ] Combat deals damage based on stats
-- [ ] Death removes entity and awards gold (heroes only)
-- [ ] All stats use `dt` for frame-rate independence
+- [ ] Day timer (e.g., 60s) — building, recruiting, assignment allowed
+- [ ] Dusk warning (5s countdown) — UI shows "Night Approaches"
+- [ ] Night timer (e.g., 90s) — heroes spawn from Entrance and march; building locked
+- [ ] Dawn phase — collect gold from hero kills, monsters heal, UI shows night summary
+- [ ] Difficulty scales per night (more heroes, stronger heroes, new hero types)
+- [ ] Pause works in both Day and Night (spacebar)
+- [ ] Night summary overlay: heroes killed, gold earned, rooms lost, monsters died
 
-**Est. Effort:** Senior Dev — 1–2 sessions | Designer — deliver unit sprites
+**Est. Effort:** Senior Dev — 1–2 sessions | Designer — day/night UI, timer visuals
 
 ---
 
-### Milestone 4: Waves & Polish
-**Goal:** Complete game loop with win/lose conditions and final art.
+### Milestone 4: Guild Members & Facilities (Evil Hunter Tycoon Core)
+**Goal:** NPC workers staff Facilities; have traits, professions, stress, and morale.
 
 **AC:**
-- [ ] 3 waves spawn according to spec
-- [ ] Spacebar toggles pause; build/recruit allowed while paused
-- [ ] Dungeon Heart destruction triggers Loss screen
-- [ ] Surviving all waves with no heroes remaining triggers Win screen
-- [ ] All placeholder art replaced with final pixel art
-- [ ] Death flash animation plays
-- [ ] Restart button returns to fresh game state
+- [ ] Facility rooms: `KITCHEN`, `FORGE`, `ALCHEMY_LAB`, `INFIRMARY`, `TAVERN`, `TRADING_POST`
+- [ ] Guild Member data model: name, portrait_id, 2 traits, profession, morale (0–100), stress (0–100)
+- [ ] Pool of 30+ NPC names and 20 personality traits
+- [ ] Wandering NPCs appear at Entrance during Day; click to recruit (pay gold)
+- [ ] Assign guild member to a Facility (drag-and-drop or click-to-assign)
+- [ ] Passive production during Day based on profession + facility match
+- [ ] Stress system: rises when monsters die / night is failed; falls when Tavern is staffed / day off given
+- [ ] If stress reaches 100, NPC quits permanently
+- [ ] Guild panel UI: list members, portraits, traits, morale/stress bars, assign profession
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — NPC portraits, facility sprites, guild panel UI
+
+---
+
+### Milestone 5: Crafting & Trading
+**Goal:** Resources are produced, recipes are crafted, and items are sold to merchants.
+
+**AC:**
+- [ ] Resource inventory: Herbs, Ore, Meat, Mana Dust
+- [ ] Facilities produce resources passively when staffed (e.g., Kitchen → Meat, Forge → Ore)
+- [ ] Recipe system: 10+ recipes (potions, meals, weapons, armor)
+- [ ] Crafting panel UI: recipe list, resource counts, "Craft" button
+- [ ] Crafted items go to inventory; can be equipped on monsters or sold
+- [ ] Trading Post: Merchants visit during Day with randomized buy requests
+- [ ] Merchant UI: "I need 3 Health Potions — 50g each" → Accept / Decline / Haggle
+- [ ] Haggle mini-game: guess merchant's max price (3 tries)
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — resource icons, crafting UI, merchant portraits
+
+---
+
+### Milestone 6: Equipment & Monster Progression
+**Goal:** Monsters equip crafted gear; rooms upgrade; Codex tracks progression.
+
+**AC:**
+- [ ] Monsters can equip 1 weapon (+damage) and 1 armor (+HP)
+- [ ] Equipment is lost if monster dies in combat
+- [ ] Battle Rooms can be upgraded with gold (+1 monster slot, +stat buffs)
+- [ ] New monster types unlocked via Codex progression (Imp, Golem)
+- [ ] Codex panel: 6 categories (Monsters, Rooms, Recipes, Heroes, Guild, Dungeons)
+- [ ] Milestone rewards at 25/50/75/100% per category (unlock new content)
+- [ ] Win/Loss screen shows Codex progress + night summary
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — equipment icons, codex UI
+
+---
+
+### Milestone 7: Hero Parties & Advanced Rooms
+**Goal:** Heroes arrive in synergistic parties; special rooms add strategic depth.
+
+**AC:**
+- [ ] Hero parties: Tank (front), DPS (middle), Healer (back)
+- [ ] Tank absorbs trap damage; Healer heals party; DPS deals damage to monsters
+- [ ] Special Battle Rooms: `ARENA` (+ATK), `BLOOD_ALTAR` (vampirism), `BARRIER` (+DEF)
+- [ ] Special Trap Rooms: `CURSE_TRAP` (weaken), `ICE_TRAP` (slow), `POISON_TRAP` (DoT)
+- [ ] Room synergy: e.g., Slow trap + Arena = kill tank before DPS arrives
+- [ ] Infirmary can "save" a dying monster (50% chance) if staffed
+- [ ] 10 nights total, each with escalating difficulty
+
+**Est. Effort:** Senior Dev — 2 sessions | Designer — special room sprites, hero class sprites
+
+---
+
+### Milestone 8: Polish, Art Pass & Browser Build
+**Goal:** Final art, sound, balance, and pygbag browser build.
+
+**AC:**
+- [ ] All placeholder art replaced with final pixel art (Dungeon Settler style)
+- [ ] Sound effects: trap trigger, monster attack, hero death, gold jingle, UI click
+- [ ] Music: ambient day theme, tense night theme
+- [ ] Death animations for heroes and monsters
+- [ ] Particle effects: trap sparks, level-up sparkle, gold pop
+- [ ] Balance pass: economy feels tight but fair; nights 1–3 are tutorial; nights 8–10 are hard
 - [ ] `pygbag` builds successfully and runs in browser
+- [ ] `manual.md` updated for final controls and mechanics
+- [ ] Full loop playable in 15–20 minutes: Build → Recruit → Craft → Defend → Progress
 
-**Est. Effort:** Senior Dev — 1 session | Designer — final asset pass
-
-### Milestone 5: NPC & Guild System
-**Goal:** Guild members exist, can be recruited, and have personalities/professions.
-
-**AC:**
-- [ ] NPC data model with name, traits, profession, morale, stats
-- [ ] Pool of 30+ unique NPC names and 20 personality traits
-- [ ] Defeated heroes have a chance to join the guild (recruitment prompt)
-- [ ] Wandering NPCs appear between waves for recruitment
-- [ ] Guild panel UI: list of members, portraits, traits, morale bars
-- [ ] NPC can be assigned a profession (if matching building exists)
-- [ ] NPC morale updates based on game events
-- [ ] NPC portrait sprites (at least 10 unique portraits)
-
-**Est. Effort:** Senior Dev — 2 sessions | Designer — NPC portraits, guild panel UI
+**Est. Effort:** Senior Dev — 2 sessions | Designer — final asset pass, sound design
 
 ---
 
-### Milestone 6: Crafting & Professions
-**Goal:** NPCs produce resources and craft items passively.
-
-**AC:**
-- [ ] Multi-tile building placement system (Farm, Alchemy Lab, Kitchen, Forge)
-- [ ] Grid expanded to 24×18 with camera scrolling
-- [ ] Profession production ticks: NPCs generate resources while working
-- [ ] Resource inventory UI (herbs, ore, fish, wheat, etc.)
-- [ ] Crafting queue: assign NPC to craft a specific recipe
-- [ ] 15+ recipes across 5 categories (potions, meals, weapons, armor, scrolls)
-- [ ] Quality tiers: Common, Uncommon, Rare, Epic
-- [ ] Profession XP and leveling (1–10)
-- [ ] Crafting log shows what was produced
-
-**Est. Effort:** Senior Dev — 2 sessions | Designer — building sprites, resource icons, crafting UI
-
----
-
-### Milestone 7: Dungeon Raids
-**Goal:** Player can send guild members on auto-battle dungeon raids.
-
-**AC:**
-- [ ] Raid party formation UI (select 1–4 NPCs)
-- [ ] 3 dungeons with multiple floors each
-- [ ] Auto-battle resolution with stat comparison
-- [ ] Battle log display after raid (damage dealt, loot, casualties)
-- [ ] Loot drops added to inventory
-- [ ] NPC rest cooldown after raid (60s)
-- [ ] Soft permadeath: failed raid → morale check → NPC may quit
-- [ ] Raid progress bar (real-time countdown)
-- [ ] Equipment system: equip crafted weapons/armor on NPCs
-
-**Est. Effort:** Senior Dev — 2 sessions | Designer — dungeon UI, raid sprites, equipment icons
-
----
-
-### Milestone 8: Trading, Codex & Chronicle
-**Goal:** Full economy loop with auction house, progression tracking, and event chronicle.
-
-**AC:**
-- [ ] Auction House building with listing UI
-- [ ] Visitor NPCs appear periodically to buy items
-- [ ] Market demand fluctuation (Low/Normal/High per category)
-- [ ] Bargain events (rare items at discount)
-- [ ] Codex screen with 9 categories and completion tracking
-- [ ] Milestone rewards at 25/50/75/100% per category
-- [ ] Chronicle event log (scrollable, timestamped)
-- [ ] Win/loss screen shows chronicle summary
-- [ ] All placeholder art replaced with final pixel art
-- [ ] Full game loop: Build → Recruit → Craft → Raid → Trade → Expand → Defend
-
-**Est. Effort:** Senior Dev — 2 sessions | Designer — auction UI, codex UI, chronicle UI, final art pass
+### Milestone 9+: Post-Prototype Expansion (Optional)
+- Save/load system
+- Endless mode (survive infinite nights)
+- Dungeon raids (send monsters to attack hero towns)
+- Multi-tile buildings and camera scrolling
+- Steam release prep
 
 ---
 
@@ -1233,6 +1247,7 @@ class Camera:
 |------|---------|--------|---------|
 | 2026-09-24 | 0.1.0 | PM + Senior Dev | Initial spec |
 | 2026-09-24 | 0.2.0 | PM | Major expansion: Added NPC/Guild system, Professions, Crafting, Dungeon Raids, Trading/Auction House, Village Expansion (multi-tile), Codex, Chronicle. New milestones M5–M8. New modules: npc.py, professions.py, crafting.py, raids.py, trading.py, village.py, codex.py, chronicle.py, camera.py |
+| 2026-09-25 | 0.3.0 | PM | **Design Pivot**: Merged Evil Hunter Tycoon (town management) + Dungeon Maker (room-based defense) + Creator Chronicles (guild sim & stress). Rewrote milestones M2–M8. Added `DESIGN_VISION.md`. Core shift: stationary monsters in Battle Rooms, fixed Entrance gauntlet, Day/Night cycle, Guild Members staff Facilities, Crafting & Trading economy. Removed free-roaming monsters, random-edge spawning, and multi-tile buildings from prototype scope. |
 
 ---
 *This SPEC is the source of truth. Any deviation requires a PR with PM approval.*

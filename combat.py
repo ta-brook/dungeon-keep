@@ -43,7 +43,7 @@ def find_nearest_enemy(
 
 
 def apply_trap_damage(heroes: List[Hero], grid: Grid, dt: float) -> int:
-    """Apply damage to heroes adjacent to trap rooms. Returns gold earned."""
+    """Apply damage to heroes standing ON trap room tiles. Returns gold earned."""
     gold_earned = 0
     trap_damage_per_sec = 5
     damage = trap_damage_per_sec * dt
@@ -56,18 +56,24 @@ def apply_trap_damage(heroes: List[Hero], grid: Grid, dt: float) -> int:
             if grid.get_tile(x, y) == TileType.TRAP_ROOM:
                 traps.append((x, y))
 
-    # Damage heroes on adjacent tiles
+    # Damage heroes who are ON the trap tile
     for hero in heroes:
         if not hero.alive:
             continue
         for tx, ty in traps:
-            if abs(hero.grid_x - tx) <= 1 and abs(hero.grid_y - ty) <= 1:
-                if hero.grid_x != tx or hero.grid_y != ty:
-                    hero.take_damage(int(damage))
+            if hero.grid_x == tx and hero.grid_y == ty:
+                # Accumulate fractional damage so low-damage-over-time works
+                if not hasattr(hero, "_trap_acc"):
+                    hero._trap_acc = 0.0
+                hero._trap_acc += damage
+                if hero._trap_acc >= 1.0:
+                    dmg = int(hero._trap_acc)
+                    hero.take_damage(dmg)
+                    hero._trap_acc -= dmg
                     if not hero.alive:
                         from constants import HERO_KILL_GOLD
                         gold_earned += HERO_KILL_GOLD
-                    break
+                break
 
     return gold_earned
 
@@ -81,32 +87,34 @@ def update_all_combat(
     """Update all combat for one frame. Returns gold earned from hero deaths."""
     gold_earned = 0
 
-    # Monsters attack heroes
+    # Monsters attack heroes in the same tile (room-based defense)
     for monster in monsters:
         if not monster.alive:
             continue
-        target = find_nearest_enemy(monster, heroes, 1.2)
+        target = find_nearest_enemy(monster, heroes, 0.5)
         if target:
             if resolve_combat(monster, target, dt):
                 gold_earned += 10
 
-    # Heroes attack monsters or Dungeon Heart
+    # Heroes attack monsters in the same tile, or damage Dungeon Heart
     for hero in heroes:
         if not hero.alive:
             continue
 
-        # Try to attack monster first
-        target = find_nearest_enemy(hero, monsters, 1.2)
+        # Try to attack monster in same room
+        target = find_nearest_enemy(hero, monsters, 0.5)
         if target:
             resolve_combat(hero, target, dt)
         else:
             # Check if at Dungeon Heart
             heart = grid.find_dungeon_heart()
             if hero.grid_x == heart[0] and hero.grid_y == heart[1]:
-                # Hero reached the heart — for now just mark as damaging
-                pass
+                # Hero damages the Dungeon Heart
+                if hero.attack_cooldown <= 0:
+                    # Dungeon heart takes damage (tracked externally)
+                    hero.attack_cooldown = 1.0 / hero.attack_speed
 
-    # Apply trap damage
+    # Apply trap damage (trigger when hero walks ON trap tile)
     gold_earned += apply_trap_damage(heroes, grid, dt)
 
     return gold_earned

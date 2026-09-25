@@ -103,54 +103,9 @@ class Monster(Entity):
         self.target: Optional[Hero] = None
 
     def update(self, dt: float, grid: Grid, all_entities: List[Entity]) -> None:
-        """Update monster AI."""
+        """Update monster — stationary defender. Only reduces cooldowns."""
         super().update(dt, grid, all_entities)
-        if not self.alive:
-            return
-
-        # Find target
-        heroes = [e for e in all_entities if isinstance(e, Hero) and e.alive]
-        self.target = self._find_target(heroes)
-
-        if self.target:
-            dist = self.distance_to(self.target)
-            if dist > 1.0:  # Move toward target
-                self._move_toward(self.target, dt, grid)
-            # Attack handled in combat.py
-
-    def _find_target(self, heroes: List["Hero"]) -> Optional["Hero"]:
-        """Find nearest hero within aggro range."""
-        nearest = None
-        nearest_dist = float("inf")
-        for hero in heroes:
-            dist = self.distance_to(hero)
-            if dist <= self.aggro_range and dist < nearest_dist:
-                nearest = hero
-                nearest_dist = dist
-        return nearest
-
-    def _move_toward(self, target: Entity, dt: float, grid: Grid) -> None:
-        """Move toward target entity."""
-        dx = target.x - self.x
-        dy = target.y - self.y
-        dist = (dx * dx + dy * dy) ** 0.5
-        if dist < 0.1:
-            return
-
-        speed = self.move_speed * TILE_SIZE * dt
-        self.x += (dx / dist) * speed
-        self.y += (dy / dist) * speed
-
-        # Snap to grid for walkability checks
-        gx = int(self.x // TILE_SIZE)
-        gy = int(self.y // TILE_SIZE)
-        if grid.is_walkable(gx, gy):
-            self.grid_x = gx
-            self.grid_y = gy
-        else:
-            # Revert if invalid
-            self.x -= (dx / dist) * speed
-            self.y -= (dy / dist) * speed
+        # Monsters are stationary in Battle Rooms; combat is handled in combat.py
 
 
 class Hero(Entity):
@@ -179,6 +134,8 @@ class Hero(Entity):
         self.animation_timer = 0.0
         self.facing_direction = "south"
         self.is_moving = False
+        # Discrete step movement: timer counts down between tile jumps
+        self.move_timer = 1.0 / self.move_speed
 
     def set_path(self, path: List[Tuple[int, int]]) -> None:
         """Set movement path."""
@@ -198,51 +155,38 @@ class Hero(Entity):
             heart = grid.find_dungeon_heart()
             self.path = grid.get_path((self.grid_x, self.grid_y), heart)
 
-        # Follow path
+        # Follow path — discrete tile steps
         if len(self.path) > 1:
-            next_tile = self.path[1]
-            self._move_to_tile(next_tile, dt, grid)
-            # Check if reached next tile
-            if self.grid_x == next_tile[0] and self.grid_y == next_tile[1]:
+            self.move_timer -= dt
+            if self.move_timer <= 0:
+                next_tile = self.path[1]
+                # Safety: only move to adjacent tiles (prevents fallback jump bugs)
+                if abs(self.grid_x - next_tile[0]) <= 1 and abs(self.grid_y - next_tile[1]) <= 1:
+                    # Snap instantly to the next tile
+                    self.grid_x = next_tile[0]
+                    self.grid_y = next_tile[1]
+                    self.x = self.grid_x * TILE_SIZE + TILE_SIZE // 2
+                    self.y = self.grid_y * TILE_SIZE + TILE_SIZE // 2
                 self.path.pop(0)
+                self.move_timer = 1.0 / self.move_speed
+
+                # Face the next upcoming tile (if any)
+                if len(self.path) > 1:
+                    dx = self.path[1][0] - self.grid_x
+                    dy = self.path[1][1] - self.grid_y
+                    angle = math.atan2(dy, dx)
+                    self.facing_direction = angle_to_direction(-angle)
+
+                # Brief moving flag for animation
+                self.is_moving = True
+                self.animation_timer = 0.0
+            else:
+                self.is_moving = False
+        else:
+            self.is_moving = False
 
     def _move_to_tile(
         self, target_tile: Tuple[int, int], dt: float, grid: Grid
     ) -> None:
-        """Move toward a specific grid tile."""
-        target_x = target_tile[0] * TILE_SIZE + TILE_SIZE // 2
-        target_y = target_tile[1] * TILE_SIZE + TILE_SIZE // 2
-
-        dx = target_x - self.x
-        dy = target_y - self.y
-        dist = (dx * dx + dy * dy) ** 0.5
-        if dist < 0.1:
-            self.grid_x = target_tile[0]
-            self.grid_y = target_tile[1]
-            return
-
-        speed = self.move_speed * TILE_SIZE * dt
-        move_dist = min(speed, dist)
-        
-        # Track movement direction for animation
-        if dist > 0.1:
-            self.is_moving = True
-            self.animation_timer += dt
-            # Determine facing direction based on movement vector
-            angle = math.atan2(dy, dx)  # radians
-            # Convert to 8 directions
-            # 0 = east, PI/2 = south, PI = west, -PI/2 = north
-            # In pygame: y increases downward, so flip y
-            self.facing_direction = angle_to_direction(-angle)
-        else:
-            self.is_moving = False
-        
-        self.x += (dx / dist) * move_dist
-        self.y += (dy / dist) * move_dist
-
-        # Update grid position
-        gx = int(self.x // TILE_SIZE)
-        gy = int(self.y // TILE_SIZE)
-        if grid.in_bounds(gx, gy):
-            self.grid_x = gx
-            self.grid_y = gy
+        """Legacy smooth-move helper; heroes now move discretely in update()."""
+        pass

@@ -1,6 +1,5 @@
 """Wave definitions and spawning logic."""
 
-import random
 from typing import List, Tuple
 
 from constants import GRID_HEIGHT, GRID_WIDTH, SPAWN_INTERVAL, WAVES
@@ -104,14 +103,5 @@ class WaveManager:
             self.start_next_wave()
 
     def _get_spawn_position(self) -> Tuple[int, int]:
-        """Get a random valid edge spawn position."""
-        # Spawn on random edge tile (not corner)
-        edge = random.choice(["top", "bottom", "left", "right"])
-        if edge == "top":
-            return (random.randint(1, self._grid.width - 2), 1)
-        elif edge == "bottom":
-            return (random.randint(1, self._grid.width - 2), self._grid.height - 2)
-        elif edge == "left":
-            return (1, random.randint(1, self._grid.height - 2))
-        else:  # right
-            return (self._grid.width - 2, random.randint(1, self._grid.height - 2))
+        """Get the Entrance spawn position."""
+        return self._grid.find_entrance()

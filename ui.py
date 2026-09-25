@@ -5,7 +5,7 @@ from typing import Callable, List, Optional, Tuple
 import pygame
 
 from assets import AssetRegistry
-from constants import COLORS, MONSTER_COSTS, PLAY_AREA_WIDTH, SIDEBAR_WIDTH, SCREEN_HEIGHT, TileType
+from constants import COLORS, MONSTER_COSTS, PLAY_AREA_WIDTH, SCALE_FACTOR, SIDEBAR_WIDTH, SCREEN_HEIGHT, TileType
 
 
 class Button:
@@ -28,8 +28,15 @@ class Button:
 
     def handle_event(self, event: pygame.event.Event) -> bool:
         """Process a Pygame event. Returns True if clicked."""
+        # Scale mouse coordinates from display to logical space
+        mouse_pos = (
+            (event.pos[0] // SCALE_FACTOR, event.pos[1] // SCALE_FACTOR)
+            if hasattr(event, "pos")
+            else (0, 0)
+        )
+
         if event.type == pygame.MOUSEMOTION:
-            self.hovered = self.rect.collidepoint(event.pos)
+            self.hovered = self.rect.collidepoint(mouse_pos)
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.hovered and not self.disabled:

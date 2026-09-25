@@ -20,6 +20,7 @@ class Grid:
             [random.randint(0, 15) for _ in range(width)] for _ in range(height)
         ]
         self._setup_boundary_walls()
+        self._place_entrance()
         self._place_dungeon_heart()
 
     def _setup_boundary_walls(self) -> None:
@@ -30,6 +31,11 @@ class Grid:
         for y in range(self.height):
             self._tiles[y][0] = TileType.STONE_WALL
             self._tiles[y][self.width - 1] = TileType.STONE_WALL
+
+    def _place_entrance(self) -> None:
+        """Place the Entrance on the left edge (inside the wall boundary)."""
+        ey = self.height // 2
+        self._tiles[ey][1] = TileType.ENTRANCE
 
     def _place_dungeon_heart(self) -> None:
         """Place the Dungeon Heart at the center."""
@@ -46,7 +52,7 @@ class Grid:
         if not self.in_bounds(x, y):
             return False
         tile = self._tiles[y][x]
-        return tile in {TileType.STONE_FLOOR}
+        return tile in {TileType.STONE_FLOOR, TileType.DUNGEON_HEART, TileType.ENTRANCE}
 
     def is_buildable(self, x: int, y: int) -> bool:
         """Return True if a room can be built here."""
@@ -78,6 +84,14 @@ class Grid:
                 if self._tiles[y][x] == TileType.DUNGEON_HEART:
                     return (x, y)
         return (self.width // 2, self.height // 2)
+
+    def find_entrance(self) -> Tuple[int, int]:
+        """Find the Entrance coordinates."""
+        for y in range(self.height):
+            for x in range(self.width):
+                if self._tiles[y][x] == TileType.ENTRANCE:
+                    return (x, y)
+        return (1, self.height // 2)
 
     def get_path(
         self, start: Tuple[int, int], end: Tuple[int, int]

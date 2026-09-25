@@ -41,7 +41,7 @@ class AssetRegistry:
                 # If file doesn't exist, skip it (no placeholders)
 
         # Load user's custom assets
-        self._load_floor_variants()
+        # self._load_floor_variants()  # Disabled: using plain colored floors
         self._load_dungeon_master()
 
     def _load_floor_variants(self) -> None:

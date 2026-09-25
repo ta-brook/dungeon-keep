@@ -46,12 +46,30 @@ def main() -> None:
     monsters: list[Monster] = []
     heroes: list[Hero] = []
 
+    # Dungeon Heart HP
+    DUNGEON_HEART_MAX_HP = 100
+    dungeon_heart_hp = DUNGEON_HEART_MAX_HP
+
     # Track hovered tile for highlighting
     hovered_tile: tuple | None = None
     build_valid: bool | None = None
 
     # Hide system cursor when using custom cursor
     pygame.mouse.set_visible(False)
+
+    def reset_game() -> None:
+        """Reset all game state to start a fresh run."""
+        nonlocal grid, build_system, ui, wave_manager, monsters, heroes, dungeon_heart_hp
+        grid = Grid()
+        build_system = BuildSystem(grid)
+        dungeon_heart_hp = DUNGEON_HEART_MAX_HP
+        ui = UI(build_system, assets)
+        wave_manager = WaveManager(grid)
+        monsters = []
+        heroes = []
+        ui.on_recruit = on_recruit
+        state_machine.change_state(GameState.PLAYING)
+        print("Game restarted")
 
     # Wire up input callbacks
     def on_grid_click(x: int, y: int) -> None:
@@ -132,6 +150,14 @@ def main() -> None:
             ):
                 on_menu_start()
 
+            # Restart from win/loss
+            if (
+                state_machine.state in (GameState.WIN, GameState.LOSS)
+                and event.type == pygame.KEYDOWN
+                and event.key == pygame.K_RETURN
+            ):
+                reset_game()
+
             # UI events (only in playing/paused)
             if state_machine.is_playing():
                 ui.handle_event(event)
@@ -181,14 +207,19 @@ def main() -> None:
             if gold_earned > 0:
                 build_system.add_gold(gold_earned)
 
-            # Check win/loss
+            # Check Dungeon Heart damage
             heart = grid.find_dungeon_heart()
             for hero in heroes:
                 if hero.alive and hero.grid_x == heart[0] and hero.grid_y == heart[1]:
-                    # Hero reached the heart
-                    state_machine.change_state(GameState.LOSS)
-                    print("Dungeon Heart destroyed!")
-                    break
+                    # Hero damages the heart
+                    if hero.attack_cooldown <= 0:
+                        dungeon_heart_hp -= hero.damage
+                        hero.attack_cooldown = 1.0 / hero.attack_speed
+                        print(f"Dungeon Heart HP: {dungeon_heart_hp}")
+
+            if dungeon_heart_hp <= 0:
+                state_machine.change_state(GameState.LOSS)
+                print("Dungeon Heart destroyed!")
 
             # Check win: all waves complete and no heroes alive
             if wave_manager.all_waves_complete:
@@ -216,6 +247,8 @@ def main() -> None:
                 wave_info=wave_info,
                 dt=dt,
                 mouse_pos=(mx, my),
+                heart_hp=dungeon_heart_hp,
+                heart_max_hp=DUNGEON_HEART_MAX_HP,
             )
 
             if state_machine.state == GameState.PAUSED:

@@ -80,6 +80,8 @@ class Renderer:
         wave_info: str = "",
         dt: float = 0.0,
         mouse_pos: tuple = (0, 0),
+        heart_hp: int = 100,
+        heart_max_hp: int = 100,
     ) -> None:
         """Draw the play area and sidebar."""
         self._time += dt
@@ -94,6 +96,9 @@ class Renderer:
         if wave_info:
             wave_text = self._font_small.render(wave_info, True, COLORS["blood_red"])
             self._logical.blit(wave_text, (10, SCREEN_HEIGHT - 20))
+
+        # Dungeon Heart HP bar
+        self._draw_heart_hp(heart_hp, heart_max_hp)
 
     def _draw_grid(
         self,
@@ -145,6 +150,7 @@ class Renderer:
         mapping = {
             TileType.STONE_WALL: "tile_stone_wall",
             TileType.DUNGEON_HEART: "tile_dungeon_heart",
+            TileType.ENTRANCE: "tile_entrance",
             TileType.LAIR: "tile_lair",
             TileType.TRAP_ROOM: "tile_trap_room",
             TileType.TREASURY: "tile_treasury",
@@ -155,23 +161,18 @@ class Renderer:
         return None
 
     def _draw_trap_indicators(self, grid: Grid) -> None:
-        """Draw warning indicators on tiles adjacent to trap rooms."""
+        """Draw warning indicators on trap room tiles."""
         for y in range(grid.height):
             for x in range(grid.width):
                 if grid.get_tile(x, y) == TileType.TRAP_ROOM:
-                    for dy in [-1, 0, 1]:
-                        for dx in [-1, 0, 1]:
-                            if dx == 0 and dy == 0:
-                                continue
-                            ax, ay = x + dx, y + dy
-                            if grid.in_bounds(ax, ay) and grid.get_tile(ax, ay) == TileType.STONE_FLOOR:
-                                rect = pygame.Rect(
-                                    ax * TILE_SIZE + 8,
-                                    ay * TILE_SIZE + 8,
-                                    16,
-                                    16,
-                                )
-                                pygame.draw.rect(self._logical, COLORS["trap_orange"], rect)
+                    # Draw a small warning symbol on the trap tile itself
+                    rect = pygame.Rect(
+                        x * TILE_SIZE + 10,
+                        y * TILE_SIZE + 10,
+                        12,
+                        12,
+                    )
+                    pygame.draw.rect(self._logical, COLORS["trap_orange"], rect)
 
     def _draw_entities(self, monsters: List[Monster], heroes: List[Hero]) -> None:
         """Draw all monsters and heroes with HP bars."""
@@ -300,12 +301,30 @@ class Renderer:
             pygame.draw.line(self._logical, COLORS["gold_yellow"], (x - 4, y), (x + 4, y), 1)
             pygame.draw.line(self._logical, COLORS["gold_yellow"], (x, y - 4), (x, y + 4), 1)
 
+    def _draw_heart_hp(self, heart_hp: int, heart_max_hp: int) -> None:
+        """Draw Dungeon Heart HP bar above the heart tile."""
+        heart = self._logical  # using logical surface
+        # Find heart position (we know it's at center from grid)
+        from constants import GRID_WIDTH, GRID_HEIGHT, TILE_SIZE
+        hx = GRID_WIDTH // 2 * TILE_SIZE
+        hy = GRID_HEIGHT // 2 * TILE_SIZE - 8
+        bar_w = 32
+        bar_h = 4
+        ratio = max(0, heart_hp / heart_max_hp)
+        fill_w = int(bar_w * ratio)
+        bg_rect = pygame.Rect(hx, hy, bar_w, bar_h)
+        fill_rect = pygame.Rect(hx, hy, fill_w, bar_h)
+        pygame.draw.rect(self._logical, COLORS["void_black"], bg_rect)
+        color = COLORS["slime_green"] if ratio > 0.5 else COLORS["trap_orange"] if ratio > 0.25 else COLORS["blood_red"]
+        pygame.draw.rect(self._logical, color, fill_rect)
+
     def _tile_color(self, tile: TileType) -> tuple:
         """Return the render color for a tile type."""
         mapping = {
             TileType.STONE_FLOOR: COLORS["stone_gray"],
             TileType.STONE_WALL: COLORS["wall_gray"],
             TileType.DUNGEON_HEART: COLORS["heart_purple"],
+            TileType.ENTRANCE: COLORS["entrance_brown"],
             TileType.LAIR: COLORS["moss_green"],
             TileType.TRAP_ROOM: COLORS["trap_orange"],
             TileType.TREASURY: COLORS["gold_yellow"],
@@ -338,6 +357,10 @@ class Renderer:
         sub_rect = sub.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
         self._logical.blit(sub, sub_rect)
 
+        restart = self._font_small.render("Press ENTER to Restart", True, COLORS["gold_yellow"])
+        restart_rect = restart.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
+        self._logical.blit(restart, restart_rect)
+
     def draw_loss_screen(self) -> None:
         """Draw loss screen overlay."""
         overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -352,3 +375,7 @@ class Renderer:
         sub = self._font_medium.render("Dungeon Heart destroyed", True, COLORS["trap_orange"])
         sub_rect = sub.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
         self._logical.blit(sub, sub_rect)
+
+        restart = self._font_small.render("Press ENTER to Restart", True, COLORS["gold_yellow"])
+        restart_rect = restart.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
+        self._logical.blit(restart, restart_rect)

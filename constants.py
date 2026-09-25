@@ -84,6 +84,7 @@ COLORS = {
     "gold_yellow": (255, 215, 0),
     "trap_orange": (204, 85, 0),
     "blood_red": (139, 0, 0),
+    "entrance_brown": (107, 68, 35),
 }
 
 
@@ -93,6 +94,7 @@ class TileType(Enum):
     STONE_FLOOR = auto()
     STONE_WALL = auto()
     DUNGEON_HEART = auto()
+    ENTRANCE = auto()
     LAIR = auto()
     TRAP_ROOM = auto()
     TREASURY = auto()
