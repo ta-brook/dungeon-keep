@@ -9,6 +9,8 @@ from assets import AssetRegistry
 from constants import (
     COLORS,
     GRID_HEIGHT,
+    GRID_OFFSET_X,
+    GRID_OFFSET_Y,
     GRID_WIDTH,
     PLAY_AREA_WIDTH,
     SCALE_FACTOR,
@@ -112,7 +114,9 @@ class Renderer:
         for y in range(grid.height):
             for x in range(grid.width):
                 tile = grid.get_tile(x, y)
-                rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                px = GRID_OFFSET_X + x * TILE_SIZE
+                py = GRID_OFFSET_Y + y * TILE_SIZE
+                rect = pygame.Rect(px, py, TILE_SIZE, TILE_SIZE)
 
                 if tile == TileType.STONE_FLOOR and has_floor_assets:
                     # Draw floor variant
@@ -137,7 +141,12 @@ class Renderer:
         if hover_tile:
             hx, hy = hover_tile
             if grid.in_bounds(hx, hy):
-                h_rect = pygame.Rect(hx * TILE_SIZE, hy * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                h_rect = pygame.Rect(
+                    GRID_OFFSET_X + hx * TILE_SIZE,
+                    GRID_OFFSET_Y + hy * TILE_SIZE,
+                    TILE_SIZE,
+                    TILE_SIZE,
+                )
                 if build_valid is True:
                     pygame.draw.rect(self._logical, COLORS["slime_green"], h_rect, 2)
                 elif build_valid is False:
@@ -167,8 +176,8 @@ class Renderer:
                 if grid.get_tile(x, y) == TileType.TRAP_ROOM:
                     # Draw a small warning symbol on the trap tile itself
                     rect = pygame.Rect(
-                        x * TILE_SIZE + 10,
-                        y * TILE_SIZE + 10,
+                        GRID_OFFSET_X + x * TILE_SIZE + 10,
+                        GRID_OFFSET_Y + y * TILE_SIZE + 10,
                         12,
                         12,
                     )
@@ -228,17 +237,21 @@ class Renderer:
     def _draw_entity(self, entity: Entity) -> None:
         """Draw a single entity with sprite or colored rectangle fallback."""
         sprite = self._get_entity_sprite(entity)
-        
+
+        # Entity positions are grid-relative; add grid offset for rendering
+        draw_x = GRID_OFFSET_X + entity.x
+        draw_y = GRID_OFFSET_Y + entity.y
+
         if sprite:
             # Center sprite on entity position
-            x = int(entity.x - sprite.get_width() // 2)
-            y = int(entity.y - sprite.get_height() // 2)
+            x = int(draw_x - sprite.get_width() // 2)
+            y = int(draw_y - sprite.get_height() // 2)
             self._logical.blit(sprite, (x, y))
         else:
             # Fallback: colored rectangle
             rect = pygame.Rect(
-                int(entity.x - 8),
-                int(entity.y - 8),
+                int(draw_x - 8),
+                int(draw_y - 8),
                 16,
                 16,
             )
@@ -247,8 +260,8 @@ class Renderer:
 
         # HP bar background
         hp_bg = pygame.Rect(
-            int(entity.x - 10),
-            int(entity.y - 14),
+            int(draw_x - 10),
+            int(draw_y - 14),
             20,
             4,
         )
@@ -259,8 +272,8 @@ class Renderer:
             hp_ratio = entity.hp / entity.max_hp
             hp_width = int(18 * hp_ratio)
             hp_fill = pygame.Rect(
-                int(entity.x - 9),
-                int(entity.y - 13),
+                int(draw_x - 9),
+                int(draw_y - 13),
                 hp_width,
                 2,
             )
@@ -275,8 +288,8 @@ class Renderer:
 
         heart = grid.find_dungeon_heart()
         # Place DM one tile below the heart
-        dm_x = heart[0] * TILE_SIZE
-        dm_y = heart[1] * TILE_SIZE + TILE_SIZE
+        dm_x = GRID_OFFSET_X + heart[0] * TILE_SIZE
+        dm_y = GRID_OFFSET_Y + heart[1] * TILE_SIZE + TILE_SIZE
 
         # Bob animation: offset y by 0-2 pixels using sine wave
         bob_offset = int(math.sin(self._time * 3) * 2)
@@ -303,13 +316,12 @@ class Renderer:
 
     def _draw_heart_hp(self, heart_hp: int, heart_max_hp: int) -> None:
         """Draw Dungeon Heart HP bar above the heart tile."""
-        heart = self._logical  # using logical surface
-        # Find heart position (we know it's at center from grid)
         from constants import GRID_WIDTH, GRID_HEIGHT, TILE_SIZE
-        hx = GRID_WIDTH // 2 * TILE_SIZE
-        hy = GRID_HEIGHT // 2 * TILE_SIZE - 8
-        bar_w = 32
-        bar_h = 4
+        # Heart is at the right edge, middle row
+        hx = GRID_OFFSET_X + (GRID_WIDTH - 1) * TILE_SIZE
+        hy = GRID_OFFSET_Y + (GRID_HEIGHT // 2) * TILE_SIZE - 10
+        bar_w = TILE_SIZE
+        bar_h = 6
         ratio = max(0, heart_hp / heart_max_hp)
         fill_w = int(bar_w * ratio)
         bg_rect = pygame.Rect(hx, hy, bar_w, bar_h)

@@ -19,27 +19,30 @@ class Grid:
         self._floor_variants: List[List[int]] = [
             [random.randint(0, 15) for _ in range(width)] for _ in range(height)
         ]
-        self._setup_boundary_walls()
         self._place_entrance()
         self._place_dungeon_heart()
+        self._setup_boundary_walls()
 
     def _setup_boundary_walls(self) -> None:
-        """Place walls around the outer edge."""
+        """Place walls around the outer edge, but leave room for Entrance and Heart."""
         for x in range(self.width):
             self._tiles[0][x] = TileType.STONE_WALL
             self._tiles[self.height - 1][x] = TileType.STONE_WALL
         for y in range(self.height):
-            self._tiles[y][0] = TileType.STONE_WALL
-            self._tiles[y][self.width - 1] = TileType.STONE_WALL
+            # Don't overwrite Entrance (left edge) or Heart (right edge)
+            if self._tiles[y][0] != TileType.ENTRANCE:
+                self._tiles[y][0] = TileType.STONE_WALL
+            if self._tiles[y][self.width - 1] != TileType.DUNGEON_HEART:
+                self._tiles[y][self.width - 1] = TileType.STONE_WALL
 
     def _place_entrance(self) -> None:
-        """Place the Entrance on the left edge (inside the wall boundary)."""
+        """Place the Entrance on the left edge."""
         ey = self.height // 2
-        self._tiles[ey][1] = TileType.ENTRANCE
+        self._tiles[ey][0] = TileType.ENTRANCE
 
     def _place_dungeon_heart(self) -> None:
-        """Place the Dungeon Heart at the center."""
-        cx = self.width // 2
+        """Place the Dungeon Heart on the right edge."""
+        cx = self.width - 1
         cy = self.height // 2
         self._tiles[cy][cx] = TileType.DUNGEON_HEART
 

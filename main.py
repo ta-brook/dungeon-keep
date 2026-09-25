@@ -7,7 +7,17 @@ import pygame
 from assets import AssetRegistry
 from build_system import BuildSystem
 from combat import update_all_combat
-from constants import FPS, SCALE_FACTOR, SCREEN_HEIGHT, SCREEN_WIDTH, GameState, TileType
+from constants import (
+    FPS,
+    GRID_OFFSET_X,
+    GRID_OFFSET_Y,
+    SCALE_FACTOR,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    TILE_SIZE,
+    GameState,
+    TileType,
+)
 from entities import Hero, Monster
 from game_state import StateMachine
 from grid import Grid
@@ -162,10 +172,12 @@ def main() -> None:
             if state_machine.is_playing():
                 ui.handle_event(event)
 
-        # Update hover position and build validity
+        # Update hover position and build validity (account for grid offset)
         mx, my = input_handler.get_mouse_logical_pos()
         if mx < SCREEN_WIDTH and my < SCREEN_HEIGHT:
-            hovered_tile = (mx // 32, my // 32)
+            grid_mx = mx - GRID_OFFSET_X
+            grid_my = my - GRID_OFFSET_Y
+            hovered_tile = (grid_mx // TILE_SIZE, grid_my // TILE_SIZE)
             if ui.selected_build and hovered_tile:
                 hx, hy = hovered_tile
                 build_valid = build_system.can_build(hx, hy, ui.selected_build)

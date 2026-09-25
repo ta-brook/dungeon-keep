@@ -10,10 +10,14 @@ SCREEN_HEIGHT = 384
 PLAY_AREA_WIDTH = 512
 SIDEBAR_WIDTH = 256
 
-# Grid dimensions
-GRID_WIDTH = 16
-GRID_HEIGHT = 12
-TILE_SIZE = 32
+# Grid dimensions (large tiles, fewer rooms — Dungeon Maker style)
+GRID_WIDTH = 6
+GRID_HEIGHT = 4
+TILE_SIZE = 72
+
+# Grid offset to center it in the play area
+GRID_OFFSET_X = (PLAY_AREA_WIDTH - GRID_WIDTH * TILE_SIZE) // 2  # (512 - 432) // 2 = 40
+GRID_OFFSET_Y = (SCREEN_HEIGHT - GRID_HEIGHT * TILE_SIZE) // 2   # (384 - 288) // 2 = 48
 
 # Rendering
 SCALE_FACTOR = 2

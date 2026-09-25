@@ -4,7 +4,7 @@ from typing import Callable, Optional, Tuple
 
 import pygame
 
-from constants import GRID_HEIGHT, GRID_WIDTH, PLAY_AREA_WIDTH, SCALE_FACTOR, TILE_SIZE
+from constants import GRID_HEIGHT, GRID_OFFSET_X, GRID_OFFSET_Y, GRID_WIDTH, PLAY_AREA_WIDTH, SCALE_FACTOR, TILE_SIZE
 
 
 class InputHandler:
@@ -38,9 +38,9 @@ class InputHandler:
         logical_y = pos[1] // SCALE_FACTOR
 
         if logical_x < PLAY_AREA_WIDTH:
-            # Grid area
-            grid_x = logical_x // TILE_SIZE
-            grid_y = logical_y // TILE_SIZE
+            # Grid area (accounting for grid offset)
+            grid_x = (logical_x - GRID_OFFSET_X) // TILE_SIZE
+            grid_y = (logical_y - GRID_OFFSET_Y) // TILE_SIZE
             if 0 <= grid_x < GRID_WIDTH and 0 <= grid_y < GRID_HEIGHT:
                 if self.on_grid_click:
                     self.on_grid_click(grid_x, grid_y)
