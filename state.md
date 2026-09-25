@@ -37,6 +37,7 @@
   - `combat.py`: Monster/hero combat range reduced to 0.5 (same tile only); trap damage triggers on hero.grid_x == trap_x and hero.grid_y == trap_y
   - `main.py`: Added `dungeon_heart_hp` tracking (100 max), heroes damage heart when on tile
   - `renderer.py`: Draws ENTRANCE tile, trap indicators on trap tiles, heart HP bar above heart
+- **Balance fix:** Hero speeds reduced to 0.5/0.4/0.3 tiles/s; added 8s prep phase before wave 1
 
 ## Blockers
 - None.
@@ -56,8 +57,9 @@
 6. When a hero enters a tile with a monster, combat begins (both attack each other)
 7. When a hero walks ON a Trap tile, they take 5 DPS
 8. If heroes reach the Dungeon Heart, they damage it (100 HP total)
-9. Win/loss screens with Enter to restart
-10. **Monsters no longer chase** — they only fight in their assigned room
+9. **8-second prep phase** before wave 1 starts (shown as "Prep: Xs" on screen)
+10. Win/loss screens with Enter to restart
+11. **Monsters no longer chase** — they only fight in their assigned room
 
 ## Next Steps
 1. **TICKET-013:** Smoke test M2 gameplay
